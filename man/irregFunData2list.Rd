@@ -10,15 +10,14 @@ irregFunData2list(data, norm = TRUE)
 \item{data}{An object of the class \code{funData::irregFunData}.}
 
 \item{norm}{Boolean, if TRUE, the sampling points are normalized on
-\eqn{[0, 1]}}
+\eqn{[0, 1]}.}
 }
 \value{
 A list, where each element represents a curve. Each curve is defined
 as a list with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item
-\strong{$x} The observed points
+\item \strong{$t} Sampling points
+\item \strong{$x} Observed points
 }
 }
 \description{
@@ -26,5 +25,5 @@ Convert \code{funData::irregFunData} objects into the right format.
 }
 \references{
 C. Happ-Kurz (2020) Object-Oriented Software for Functional Data.
-Journal of Statistical Software, 93(5): 1-38 .
+Journal of Statistical Software, 93(5): 1-38.
 }

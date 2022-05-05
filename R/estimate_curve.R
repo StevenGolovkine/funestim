@@ -13,12 +13,12 @@
 #'   \item \strong{$x} Observed points.
 #'  } 
 #' @param grid Vector, sampling points at which the curve is estimated.
-#' @param bandwith Vector, estimation of the bandwidth. If a unique element is 
+#' @param bandwidth Vector, estimation of the bandwidth. If a unique element is 
 #' provided, we use a  unique bandwidth for the curve. However, if a vector is 
 #' given, the bandwidth changes depending on the sampling points. 
-#' @param bandwith_times Vector (default = NULL), times at which the bandwidths 
+#' @param bandwidth_times Vector (default = NULL), times at which the bandwidths 
 #' have been estimated. Only used if the parameter \code{bandwidth} is a vector.
-#' @param kernel String (default = 'epanechnikov'), the kernel used for the 
+#' @param kernel_name String (default = 'epanechnikov'), the kernel used for the 
 #' estimation:
 #'  \itemize{
 #'   \item epanechnikov
@@ -37,7 +37,7 @@
 #'  
 #' @export
 estimate_curve <- function(curve, grid, bandwidth, bandwidth_times = NULL,
-                           kernel = "epanechnikov", n_obs_min = 1) {
+                           kernel_name = "epanechnikov", n_obs_min = 1) {
   if (length(bandwidth) == 1) {
     bandwidth <- rep(bandwidth, length(grid))
   } else if ((length(bandwidth) != length(grid)) & !is.null(bandwidth_times)) {
@@ -51,13 +51,13 @@ estimate_curve <- function(curve, grid, bandwidth, bandwidth_times = NULL,
     stop("Issues with the bandwidth parameter.")
   }
   
-  if (kernel == "epanechnikov") {
+  if (kernel_name == "epanechnikov") {
     x_hat <- epaKernelSmoothingCurve(
       grid, curve$t, curve$x, bandwidth, n_obs_min)
-  } else if (kernel == "uniform") {
+  } else if (kernel_name == "uniform") {
     x_hat <- uniKernelSmoothingCurve(
       grid, curve$t, curve$x, bandwidth, n_obs_min)
-  } else if (kernel == "biweight") {
+  } else if (kernel_name == "biweight") {
     x_hat <- biweightKernelSmoothingCurve(
       grid, curve$t, curve$x, bandwidth, n_obs_min)
   } else {
@@ -81,18 +81,19 @@ estimate_curve <- function(curve, grid, bandwidth, bandwidth_times = NULL,
 #' @param grid Vector (default = NULL), sampling points at which estimate the 
 #' curves. If NULL, the sampling points for the estimation are the same than the
 #' observed ones.
-#' @param grid_param Vector (default = 0.5), sampling points at which we 
-#' estimate the parameters.
+#' @param grid_param Vector (default = c(0.25, 0.5, 0.75)), sampling points at
+#' which we estimate the parameters.
 #' @param grid_bandwidth Vector (default = NULL), grid of bandwidths.
-#' @param kernel String (default = 'epanechnikov'), the kernel used for the 
+#' @param delta_f Function (default = NULL), function to determine the delta.
+#' @param n_obs_min Integer (default = 2), minimum number of observation for 
+#' the smoothing.
+#' @param kernel_name String (default = 'epanechnikov'), the kernel used for the 
 #' estimation:
 #'  \itemize{
 #'   \item epanechnikov
 #'   \item uniform
 #'   \item biweight
 #'  }
-#' @param n_obs_min Integer (default = 2), minimum number of observation for 
-#' the smoothing.
 #'
 #' @return A list, which contains two elements. The first one is a list which 
 #'  contains the estimated parameters:
@@ -112,33 +113,32 @@ estimate_curve <- function(curve, grid, bandwidth, bandwidth_times = NULL,
 #' @references Golovkine S., Klutchnikoff N., Patilea V. (2021) - Adaptive
 #'  estimation of irregular mean and covariance functions.
 #' @export
-smooth_curves <- function(curves, grid = NULL,
-                          grid_param = 0.5, grid_bandwidth = NULL, 
-                          kernel = 'epanechnikov', n_obs_min = 2){
-  
-  if (kernel == 'uniform') type_k = 1
-  else if (kernel == 'epanechnikov') type_k = 2
-  else if (kernel == 'biweight') type_k = 3
-  else type_k = 1
-  
+smooth_curves_mean <- function(
+    curves, grid = NULL, grid_param = c(0.25, 0.5, 0.75),
+    grid_bandwidth = NULL, delta_f = NULL,
+    kernel_name = 'epanechnikov', n_obs_min = 2
+){
   # Estimation of the different parameters
-  param_estim <- estimate_bandwidths(curves, t0_list = grid_param, 
-                                     grid = grid_bandwidth,
-                                     nb_obs_minimal = n_obs_min,
-                                     type_k = type_k)
-
+  param_estim <- estimate_bandwidths_mean(
+    curves, grid_param = grid_param, grid_bandwidth = grid_bandwidth,
+    delta_f = delta_f, n_obs_min = n_obs_min, kernel_name = kernel_name)
+  bandwidth_estim <- param_estim |> sapply(function(point) point$bandwidth)
+  
   # Estimation of the curves
   if (is.null(grid)) {
-    curves_estim <- curves |> 
-      purrr::map(~ estimate_curve(.x, U = .x$t, b = param_estim$b,
-                                  t0_list = grid_param, kernel = kernel,
-                                  n_obs_min = n_obs_min))
+    curves_estim <- curves |> lapply(function(curve) {
+      estimate_curve(curve, grid = curve$t, bandwidth = bandwidth_estim,
+                     bandwidth_times = grid_param, kernel_name = kernel_name,
+                     n_obs_min = n_obs_min)
+    })
   } else {
-    curves_estim <- curves |> 
-      purrr::map(~ estimate_curve(.x, U = grid, b = param_estim$b,
-                                  t0_list = grid_param, kernel = kernel,
-                                  n_obs_min = n_obs_min))
+    curves_estim <- curves |> lapply(function(curve) {
+      estimate_curve(curve, grid = grid, bandwidth = bandwidth_estim,
+                     bandwidth_times = grid_param, kernel_name = kernel_name,
+                     n_obs_min = n_obs_min)
+    })
   }
-  list("parameter" = param_estim, "smooth" = curves_estim)
+  
+  list("parameters" = param_estim, "curves_smooth" = curves_estim)
 }
 # ----

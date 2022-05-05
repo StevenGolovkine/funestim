@@ -4,31 +4,61 @@
 \alias{presmoothing}
 \title{Perform a pre-smoothing of the data.}
 \usage{
-presmoothing(data, t0_list = 0.5, gamma = 0.5, order = 1, drv = 0)
+presmoothing(
+  curves,
+  point = 0.5,
+  delta_f = NULL,
+  kernel = "epanechnikov",
+  beta = 1,
+  bandwidth_naive = 0
+)
 }
 \arguments{
-\item{data}{A list, where each element represents a curve. Each curve have to
+\item{curves}{List, where each element represents a curve. Each curve have to
 be defined as a list with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points
+\item \strong{$t} Sampling points
+\item \strong{$x} Observed points
 }}
 
-\item{t0_list}{Vector, the sampling point at which we pre-smooth the data.}
+\item{point}{Numeric (default = 0.5), sampling point at which the data is
+pre-smoothed.}
 
-\item{gamma}{Numeric, default=0.5. Constant \eqn{\gamma} used in the theorem
-1 in the paper. Should be between 0 and 1.}
+\item{delta_f}{Function (default = NULL), function to determine the delta.}
 
-\item{order}{Integer, default=0. Regularity of the input data.}
+\item{kernel}{String (default = 'epanechnikov'), the kernel used for the
+estimation:
+\itemize{
+\item epanechnikov
+\item uniform
+\item biweight
+}}
 
-\item{drv}{Integer, default=0. Order of derivative to be estimated.}
+\item{beta}{Numeric (default = 1), pre-specified regularity of the curves.
+The default value is 1, which correspond to at least one time
+differentiable curves.}
+
+\item{bandwidth_naive}{Numeric (default = 0), bandwidth to use for the
+presmoothing. If set to 0, the bandwidth will be defined as
+\deqn{\frac{\delta}{m}^{1 / (2\beta + 1)}}
+where
+\itemize{
+\item \eqn{m} is the mean number of sampling points per curve.
+\item \eqn{\delta} is the length of the interval where the smoothing is
+done.
+\item \eqn{\beta} represents the regularity of the curves.
+}}
 }
 \value{
-List of array. Contains the smoothed data.
+List, with two entries:
+\itemize{
+\item \strong{$grid} Grid on which the smoothing has been done.
+\item \strong{$x_smooth} The smoothed data.
+}
 }
 \description{
-This function performs a pre-smoothing of the data by local linear smoother.
-We use a Gaussian kernel and a naive bandwidth.
+This function performs a pre-smoothing of the data using a Nadaraya-Watson
+estimator. We use an Epanechnikov kernel and a naive bandwidth.
 }
 \references{
 S. Golovkine, N. Klutchnikoff and V. Patilea (2021) - Adaptive

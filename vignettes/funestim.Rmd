@@ -45,7 +45,9 @@ We perform an estimation of the mean curve.
 ```{r estimate_mean, warning=FALSE, message=FALSE, cache=TRUE}
 obs_points <- seq(0, 1, length.out = 101)  # Estimation grid mean
 band_points <- seq(0.05, 0.95, length.out = 50) # Estimation grid regularity
-mean_curve <- mean_ll(X, U = obs_points, t0_list = band_points)
+delta_f <- function(m) exp(-log(m)**0.5)
+mean_curve <- mean_ll(X, grid = obs_points,
+                      grid_param = band_points, delta_f = delta_f)
 ```
 
 ```{r plot_mean, echo=FALSE, fig.height=4.35, fig.width=7}
@@ -59,13 +61,13 @@ lines(obs_points, mean_curve$mu, col = 'red', lwd = 4)
 We perform an estimation of the covariance surface.
 
 ```{r estimate_cov, warning=FALSE, message=FALSE, cache=TRUE}
-obs_points <- seq(0, 1, length.out = 101)  # Estimation grid mean
-band_points <- seq(0.05, 0.95, length.out = 10) # Estimation grid regularity
-cov_our <- covariance_ll(X, U = obs_points, t0_list = band_points, 
-                         centered = FALSE)
+#obs_points <- seq(0, 1, length.out = 101)  # Estimation grid mean
+#band_points <- seq(0.05, 0.95, length.out = 10) # Estimation grid regularity
+#cov_our <- covariance_ll(X, U = obs_points, t0_list = band_points, 
+#                         centered = FALSE)
 ```
 
 ```{r plot_cov, echo=FALSE, fig.height=7, fig.width=7}
-filled.contour(cov_our$cov, nlevels = 5)
+#filled.contour(cov_our$cov, nlevels = 5)
 ```
 

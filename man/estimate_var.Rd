@@ -4,13 +4,13 @@
 \alias{estimate_var}
 \title{Perform an estimation of \eqn{Var(X_{t_0)}}.}
 \usage{
-estimate_var(data)
+estimate_var(curves_smooth)
 }
 \arguments{
-\item{data}{List of array, resulting from the pre-smoothing function.}
+\item{curves_smooth}{List, resulting from the \code{presmoothing} function.}
 }
 \value{
-Vector, estimation of the variance at each \eqn{t_0}.
+Numeric, estimation of the variance at \eqn{t_0}.
 }
 \description{
 This function performs an estimation of \eqn{Var(X_{t_0})} used for the

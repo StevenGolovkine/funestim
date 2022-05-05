@@ -4,16 +4,17 @@
 \alias{kernel}
 \title{Compute the values for some kernels.}
 \usage{
-kernel(u, type = 1)
+kernel(u, type = "epanechnikov")
 }
 \arguments{
 \item{u}{Vector, points to estimate the kernel.}
 
-\item{type}{Integer, used kernel.
+\item{type}{String (default = 'epanechnikov'), the kernel used for the
+estimation:
 \itemize{
-\item \strong{1} Uniform kernel
-\item \strong{2} Epanechnikov kernel
-\item \strong{3} Biweight kernel
+\item epanechnikov
+\item uniform
+\item biweight
 }}
 }
 \value{

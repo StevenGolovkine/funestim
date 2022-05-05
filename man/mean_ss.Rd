@@ -4,20 +4,20 @@
 \alias{mean_ss}
 \title{Perform an estimation of the mean with smoothing splines.}
 \usage{
-mean_ss(data, U)
+mean_ss(curves, grid)
 }
 \arguments{
-\item{data}{A list, where each element represents a curve. Each curve have to
+\item{curves}{List, where each element represents a curve. Each curve have to
 be defined as a list with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points.
+\item \strong{$t} Sampling points
+\item \strong{$x} Observed points.
 }}
 
-\item{U}{Vector, sampling points at which estimate the mean.}
+\item{grid}{Vector, sampling points at which estimate the mean.}
 }
 \value{
-A vector representing the mean curve.
+Vector representing the mean curve.
 }
 \description{
 This function performs the estimation of the mean of a set of curves using

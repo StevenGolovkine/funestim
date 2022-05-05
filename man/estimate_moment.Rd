@@ -4,20 +4,20 @@
 \alias{estimate_moment}
 \title{Perform the estimation of the moments.}
 \usage{
-estimate_moment(data, order = 1)
+estimate_moment(curves_smooth, order = 1)
 }
 \arguments{
-\item{data}{List of array, resulting from the pre-smoothing function.}
+\item{curves_smooth}{List, resulting from the \code{presmoothing} function.}
 
-\item{order}{Numeric (default=1), the moment to estimate.}
+\item{order}{Numeric (default = 1), the moment to estimate.}
 }
 \value{
-Vector, estimation of the moments.
+Numeric, an estimation of the moments \eqn{E(X^{\alpha}_{t_0})}
 }
 \description{
-This function performs an estimation of the moments used for the estimation
-of the bandwidth for a univariate kernel regression estimator defined over
-continuous domains data.
+This function performs an estimation of the moments \eqn{E(X^{\alpha}_{t_0})}
+used for the estimation of the bandwidth for a univariate kernel regression
+estimator defined over continuous domains data.
 }
 \references{
 Golovkine S., Klutchnikoff N., Patilea V. (2021) - Adaptive

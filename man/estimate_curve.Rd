@@ -6,44 +6,45 @@
 \usage{
 estimate_curve(
   curve,
-  U,
-  b,
-  t0_list = NULL,
-  kernel = "epanechnikov",
+  grid,
+  bandwidth,
+  bandwidth_times = NULL,
+  kernel_name = "epanechnikov",
   n_obs_min = 1
 )
 }
 \arguments{
-\item{curve}{A list, with two entries:
+\item{curve}{List, with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points.
+\item \strong{$t} Sampling points.
+\item \strong{$x} Observed points.
 }}
 
-\item{U}{Vector, sampling points at which estimate the curve.}
+\item{grid}{Vector, sampling points at which the curve is estimated.}
 
-\item{b}{Vector, estimation of the bandwidth. If one is provided, we use a
-unique bandwidth for the curve. However, if a vector is given, the bandwidth
-changes depending on the sampling points.}
+\item{bandwidth}{Vector, estimation of the bandwidth. If a unique element is
+provided, we use a  unique bandwidth for the curve. However, if a vector is
+given, the bandwidth changes depending on the sampling points.}
 
-\item{t0_list}{Vector, times at which the bandwidths have been
-estimated. Only used if the parameter \code{b} is a vector.}
+\item{bandwidth_times}{Vector (default = NULL), times at which the bandwidths
+have been estimated. Only used if the parameter \code{bandwidth} is a vector.}
 
-\item{kernel}{Character string, the kernel used for the estimation:
+\item{kernel_name}{String (default = 'epanechnikov'), the kernel used for the
+estimation:
 \itemize{
-\item epanechnikov (default)
+\item epanechnikov
 \item uniform
-\item beta
-\item mBeta
+\item biweight
 }}
 
-\item{n_obs_min}{Integer, minimum number of observation for the smoothing.}
+\item{n_obs_min}{Integer (default = 1), minimum number of observation for
+the smoothing.}
 }
 \value{
 List, with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The estimated points.
+\item \strong{$t} Sampling points.
+\item \strong{$x} Estimated points.
 }
 }
 \description{

@@ -15,20 +15,24 @@
 #'   \item \strong{$t} Sampling points
 #'   \item \strong{$x} Observed points.
 #'  } 
-#' @param point Numeric, sampling point at which we estimate the bandwidth.
-#' @param hurst Numeric, estimation of the Hurst coefficient \eqn{H_0}.
-#' @param constant Numeric, estimation of the constant \eqn{L_0}.
+#' @param params List, estimation of the different parameters:
+#'  \itemize{
+#'   \item \strong{$point} Time point where the smoothing has been done.
+#'   \item \strong{$H} Estimated regularity.
+#'   \item \strong{$L} Estimated constant.
+#'   \item \strong{$var} Estimated variance.
+#'  }
 #' @param sigma Numeric, estimation of the std of the noise \eqn{\sigma}.
-#' @param variance Numeric, estimation of the variance of the process.
-#' @param grid_bandwidth Vector (default = lseq(0.001, 0.1, length.out = 11)), 
+#' @param grid_bandwidth Vector (default = lseq(0.001, 0.1, length.out = 101)), 
 #' grid of bandwidths.
 #' @param n_obs_min Integer (default = 2), minimum number of points in the 
 #'  neighborhood to keep the curve in the estimation.
-#' @param type_kernel Integer (default = 2), Used kernel.
+#' @param kernel_name String (default = 'epanechnikov'), the kernel used for the 
+#' estimation:
 #'  \itemize{
-#'   \item \strong{1} uniform kernel
-#'   \item \strong{2} epanechnikov kernel
-#'   \item \strong{3} biweight kernel
+#'   \item epanechnikov
+#'   \item uniform
+#'   \item biweight
 #'  }
 #'
 #' @return Numeric, estimation of the bandwidth.
@@ -36,44 +40,58 @@
 #' @references Golovkine S., Klutchnikoff N., Patilea V. (2021) - Adaptive
 #'  estimation of irregular mean and covariance functions.
 #' @export
-estimate_bandwidth <- function(
-    curves, point, 
-    hurst = 0.5, constant = 1, 
-    sigma = 0, variance = 0,
-    grid_bandwidth = lseq(0.001, 0.1, length.out = 11),
-    n_obs_min = 2, type_kernel = 2) {
+estimate_bandwidth_mean <- function(
+    curves, params, sigma = 0, 
+    grid_bandwidth = lseq(0.001, 0.1, length.out = 101),
+    n_obs_min = 2, kernel_name = 'epanechnikov') {
   # Define constants
   cst_kernel <- switch(
-    type_kernel,  
-    1 / (1 + 2 * hurst), 
-    1.5 * (1 / (1 + 2 * hurst) - 1 / (3 + 2 * hurst)),
-    1.875 * (1 / (1 + 2 * hurst) - 2 / (3 + 2 * hurst) + 1 / (5 + 2 * hurst))
+    kernel_name,  
+    uniform = 1 / (1 + 2 * params$H), 
+    epanechnikov = 1.5 * (1 / (1 + 2 * params$H) - 1 / (3 + 2 * params$H)),
+    biweight = 1.875 * (
+      1 / (1 + 2 * params$H) - 2 / (3 + 2 * params$H) + 1 / (5 + 2 * params$H)
+    )
   )
-  q1 <- constant / factorial(floor(hurst)) * sqrt(cst_kernel)
+  q1 <- params$L / factorial(floor(params$H)) * sqrt(cst_kernel)
   q2 <- sigma
-  q3 <- sqrt(variance)
+  q3 <- sqrt(params$var)
   
   risk <- rep(NA, length(grid_bandwidth))
   for (idx in 1:length(grid_bandwidth)) {
     current_bandwidth <- grid_bandwidth[idx]
     
     wi <- curves |> 
-      purrr::map_dbl(~ neighbors(.x$t, point, current_bandwidth, n_obs_min))
+      sapply(function(curve) {
+        neighbors(curve$t, params$point, current_bandwidth, n_obs_min)
+      })
     WN <- sum(wi)
     if (WN == 0) next
     
     temp <- curves |> 
-      purrr::map(~ kernel((.x$t - point) / current_bandwidth, type_kernel))
-    Wi <- temp |> purrr::map(~ .x / sum(.x))
-    Ni <- wi / purrr::map_dbl(Wi, ~ max(.x))
+      lapply(function(curve) {
+        kernel((curve$t - params$point) / current_bandwidth, type = kernel_name)
+      })
+    Wi <- temp |> 
+      lapply(function(curve) {
+      curve / sum(curve)
+      })
+    Ni <- wi / sapply(Wi, function(curve) max(curve))
     Ni[Ni == 0] <- NA
     Nmu <- WN / mean(1/Ni, na.rm = TRUE)
     
-    risk[idx] <- q1**2 * current_bandwidth**(2 * hurst) +
+    risk[idx] <- q1**2 * current_bandwidth**(2 * params$H) +
       q2**2 / Nmu +
       q3**2 / WN
   }
-  grid_bandwidth[which.min(risk)]
+  
+  list(
+    "point" = params$point,
+    "H" = params$H,
+    "L" = params$L,
+    "var" = params$var,
+    "bandwidth" = grid_bandwidth[which.min(risk)]
+  )
 }
 
 #' Perform an estimation of the bandwidth for the estimation of the mean.
@@ -87,16 +105,18 @@ estimate_bandwidth <- function(
 #'   \item \strong{$t} Sampling points
 #'   \item \strong{$x} Observed points.
 #'  } 
-#' @param grid_param Vector, the sampling points at which we estimate the 
-#'  parameters.
+#' @param grid_param Vector (default = c(0.25, 0.5, 0.75)), the sampling points 
+#' at which we estimate the parameters.
 #' @param grid_bandwidth Vector (default = NULL), grid of bandwidths.
+#' @param delta_f Function (default = NULL), function to determine the delta.
 #' @param n_obs_min Integer (default = 2), minimum number of points in the 
 #'  neighborhood to keep the curve in the estimation.
-#' @param type_kernel Integer (default = 2), used kernel:
+#' @param kernel_name String (default = 'epanechnikov'), the kernel used for the 
+#' estimation:
 #'  \itemize{
-#'   \item \strong{1} uniform kernel
-#'   \item \strong{2} epanechnikov kernel
-#'   \item \strong{3} biweight kernel
+#'   \item epanechnikov
+#'   \item uniform
+#'   \item biweight
 #'  }
 #'
 #' @return List, with elements:
@@ -111,45 +131,34 @@ estimate_bandwidth <- function(
 #' @references Golovkine S., Klutchnikoff N., Patilea V. (2021) - Adaptive
 #'  estimation of irregular mean and covariance functions.
 #' @export
-estimate_bandwidths <- function(
-    curves, grid_param = 0.5, grid_bandwidth = NULL,
-    n_obs_min = 2, type_kernel = 2) {
+estimate_bandwidths_mean <- function(
+    curves, grid_param = c(0.25, 0.5, 0.75), grid_bandwidth = NULL,
+    delta_f = NULL, n_obs_min = 2, kernel_name = 'epanechnikov') {
   if (!inherits(curves, 'list')) curves <- checkData(curves)
   
   # Estimation of the parameters -- TO MODIFY FOR RECURSIVE ESTIMATION
-  M <- curves |> purrr::map_dbl(~ length(.x$t)) |> mean()
-  data_presmooth <- presmoothing(curves, grid_param, gamma = 0.5)
-  sigma_estim <- estimate_sigma(curves, grid_param, k0_list = 2)
-  variance_estim <- estimate_var(data_presmooth)
-  hurst_estim <- estimate_H0(data_presmooth)
-  constant_estim <- estimate_L0(data_presmooth, hurst_estim, M)
+  m <- curves |> sapply(function(curve) length(curve$t)) |> mean()
+  sigma_estim <- estimate_sigma(curves, delta = delta_f(m))
+  params_estim <- estimate_parameters(
+    curves, grid = grid_param, delta_f = delta_f, kernel = kernel_name, beta = 1)
   
   if (is.null(grid_bandwidth)) {
     N <- length(curves)
-    Mi <- curves |> purrr::map_dbl(~ length(.x$t))
-    aa <- log(1/(N*max(Mi))) / min(2 * hurst_estim + 1) - log(1)
-    bb <- log(1/(N*min(Mi))) / max(2 * hurst_estim + 1) + log(5)
+    Mi <- curves |> sapply(function(curve) length(curve$t))
+    hurst_estim <- sapply(params_estim, function(param) param$H)
+    aa <- log(1 / m)
+    bb <- log(1/(N * min(Mi))) / max(2 * hurst_estim + 1) + log(5)
     grid_bandwidth <- exp(seq(aa, bb, length.out = 151))
   }
   
   # Estimation of the bandwidth -- CODE IN C++
-  bandwidth_estim <- list(grid_param, hurst_estim, constant_estim, 
-                          sigma_estim, variance_estim) |>
-    purrr::pmap_dbl(function(t0, H0, L0, s, v){
-      estimate_bandwidth(curves, point = t0, hurst = H0, constant = L0, 
-                         sigma = s, variance = v, 
-                         grid_bandwidth = grid_bandwidth, n_obs_min = n_obs_min,
-                         type_kernel = type_kernel)
-      }
-    )
-
-  list(
-    "sigma" = sigma_estim,
-    "variance" = variance_estim,
-    "H0" = hurst_estim,
-    "L0" = constant_estim,
-    "b" = bandwidth_estim
-  )
+  params_estim |>
+    lapply(function(param) {
+      estimate_bandwidth_mean(
+        curves, param, sigma = sigma_estim, 
+        grid_bandwidth = grid_bandwidth,
+        n_obs_min = n_obs_min, kernel_name = kernel_name)
+    })
 }
 
 #' Perform an estimation of the bandwidth for the estimation of the covariance.

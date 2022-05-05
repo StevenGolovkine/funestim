@@ -48,8 +48,8 @@ estimate_sigma <- function(curves, delta = 0.1){
 #' @param curves List, where each element represents a curve. Each curve have to
 #'  be defined as a list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points
 #'  } 
 #' @param point Numeric (default = 0.5), sampling point at which the data is 
 #' pre-smoothed.
@@ -108,7 +108,7 @@ presmoothing <- function(curves, point = 0.5, delta_f = NULL,
 #' estimation of the bandwidth for the mean and the covariance by a univariate
 #' kernel regression estimator.
 #' 
-#' @param curves_smoothed List, resulting from the `presmoothing` function.
+#' @param curves_smooth List, resulting from the `presmoothing` function.
 #' 
 #' @return Numeric, estimation of the variance at \eqn{t_0}.
 #' 
@@ -304,7 +304,7 @@ estimate_parameters_recursion <- function(
 #'  }
 #' @param beta Numeric (default = 1), pre-specified regularity of the curves to
 #' start the recursion. The default value is 1, which correspond to at least one
-#'time differentiable curves.
+#' time differentiable curves.
 #'
 #' @return List, with four entries:
 #'  \itemize{

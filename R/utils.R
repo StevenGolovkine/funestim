@@ -15,7 +15,7 @@
 #' @param norm Boolean, if TRUE, the sampling points are normalized on 
 #' \eqn{[0, 1]}.
 #' 
-#' @return A list, where each element represents a curve. Each curve is defined
+#' @return List, where each element represents a curve. Each curve is defined
 #' as a list with two entries:
 #'  \itemize{
 #'   \item \strong{$t} Sampling points
@@ -234,21 +234,22 @@ lseq <- function(from = 1, to = 100, length.out = 51) {
 #' Compute the values for some kernels.
 #' 
 #' @param u Vector, points to estimate the kernel.
-#' @param type Integer, used kernel. 
+#' @param type String (default = 'epanechnikov'), the kernel used for the 
+#' estimation:
 #'  \itemize{
-#'   \item \strong{1} uniform kernel
-#'   \item \strong{2} epanechnikov kernel
-#'   \item \strong{3} biweight kernel
+#'   \item epanechnikov
+#'   \item uniform
+#'   \item biweight
 #'  }
 #'  
 #' @return Vector, the evaluated kernel.
 #' @export
-kernel <- function(u, type = 1){
+kernel <- function(u, type = 'epanechnikov'){
   indicator <- function(u) 2 * stats::dunif(u, -1, 1)
   switch(type,
-         indicator(u) / 2,
-         0.75 * (1 - u**2) * indicator(u),
-         0.9375 * (1 - u**2)**2 * indicator(u))
+         uniform = {indicator(u) / 2},
+         epanechnikov = {0.75 * (1 - u**2) * indicator(u)},
+         biweight = {0.9375 * (1 - u**2)**2 * indicator(u)})
 }
 
 #' Test whether the observation points are in the neighborhood.

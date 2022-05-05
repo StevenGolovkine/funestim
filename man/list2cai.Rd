@@ -10,16 +10,16 @@ list2cai(data)
 \item{data}{A list, where each element represents a curve. Each curve is
 defined as a list with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points
+\item \strong{$t} Sampling points
+\item \strong{$x} Observed points
 }}
 }
 \value{
 A dataframe where the columns are:
 \itemize{
-\item \strong{$time} The observation times.
-\item \strong{x} The observation values.
-\item \strong{subject} The observation id.
+\item \strong{time} Observation times.
+\item \strong{x} Observation values.
+\item \strong{subject} Observation id.
 }
 }
 \description{

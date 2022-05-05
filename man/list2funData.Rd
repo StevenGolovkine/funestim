@@ -10,8 +10,8 @@ list2funData(data_list)
 \item{data_list}{A list, where each element represents a curve. Each curve is
 defined as list with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points
+\item \strong{$t} Sampling points
+\item \strong{$x} Observed points
 }}
 }
 \value{

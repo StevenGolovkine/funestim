@@ -4,27 +4,20 @@
 \alias{estimate_sigma}
 \title{Perform an estimation of the standard deviation of the noise.}
 \usage{
-estimate_sigma(data, t0_list, k0_list)
+estimate_sigma(curves, delta = 0.1)
 }
 \arguments{
-\item{data}{A list, where each element represents a curve. Each curve have to
+\item{curves}{List, where each element represents a curve. Each curve have to
 be defined as list with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points
+\item \strong{$t} Sampling points.
+\item \strong{$x} Observed points.
 }}
 
-\item{t0_list}{Vector, the sampling points at which we estimate \eqn{H_0}. We
-will consider the \eqn{8k0 - 7} nearest points of \eqn{t_0} for the
-estimation of \eqn{H_0} when \eqn{\sigma} is unknown.}
-
-\item{k0_list}{Vector, the number of neighbors of \eqn{t_0} to consider.
-Should be set as \eqn{k0 = M\exp(-(\log(\log(M))**2))}. We can set a
-different \eqn{k_0}, but in order to use the same for each \eqn{t_0}, just
-put a unique numeric.}
+\item{delta}{Numeric (default = 0.1), neighborhood for the estimation.}
 }
 \value{
-A list, an estimation of sigma at different \eqn{t_0}.
+Numeric, estimation of the std of the noise \eqn{\sigma}
 }
 \description{
 This function performs an estimation of the standard deviation of the noise

@@ -66,6 +66,6 @@ estimation of irregular mean and covariance functions.
 }
 \seealso{
 Other estimate bandwidth: 
-\code{\link{estimate_bandwidth}()}
+\code{\link{estimate_bandwidth_mean}()}
 }
 \concept{estimate bandwidth}

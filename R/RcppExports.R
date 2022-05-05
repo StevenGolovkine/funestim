@@ -13,7 +13,7 @@ biweightKernelSmoothingCurve <- function(U, T, Y, b, n_obs_min) {
     .Call('_funestim_biweightKernelSmoothingCurve', PACKAGE = 'funestim', U, T, Y, b, n_obs_min)
 }
 
-estimateSigma <- function(curves) {
-    .Call('_funestim_estimateSigma', PACKAGE = 'funestim', curves)
+estimateSigma <- function(curves, delta) {
+    .Call('_funestim_estimateSigma', PACKAGE = 'funestim', curves, delta)
 }
 

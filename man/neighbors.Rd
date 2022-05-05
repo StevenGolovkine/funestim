@@ -7,13 +7,13 @@
 neighbors(t, t0, h, k0)
 }
 \arguments{
-\item{t}{Vector, the sampling points.}
+\item{t}{Vector, sampling points.}
 
-\item{t0}{Numeric, the estimation point.}
+\item{t0}{Numeric, estimation point.}
 
-\item{h}{Numeric, the bandwidth.}
+\item{h}{Numeric, bandwidth.}
 
-\item{k0}{Numeric, the number of points to be in the neighborhood.}
+\item{k0}{Numeric, number of points to be in the neighborhood.}
 }
 \value{
 Boolean, true if there are enough points in the neighborhood.

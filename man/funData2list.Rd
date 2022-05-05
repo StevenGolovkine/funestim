@@ -13,11 +13,11 @@ funData2list(data, norm = TRUE)
 \eqn{[0, 1]}.}
 }
 \value{
-A list, where each element represents a curve. Each curve is defined
+List, where each element represents a curve. Each curve is defined
 as a list with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points
+\item \strong{$t} Sampling points
+\item \strong{$x} Observed points
 }
 }
 \description{
