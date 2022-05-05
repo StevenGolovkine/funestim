@@ -30,8 +30,8 @@ funData2list <- function(data, norm = TRUE){
   x <- funData::X(data)
   
   data_list <- list()
-  for(i in 1:funData::nObs(data)){
-    if(norm) t <- (t - min(t)) / (max(t) - min(t))
+  for (i in 1:funData::nObs(data)) {
+    if (norm) t <- (t - min(t)) / (max(t) - min(t))
     data_list[[i]] <- list(t = t, x = x[i,])
   }
   
@@ -41,8 +41,6 @@ funData2list <- function(data, norm = TRUE){
 #' Convert comprehensive lists into \code{funData::funData} objects.
 #' 
 #' We assume that we \strong{know} that the curves are on the same interval.
-#' 
-#' @importFrom magrittr %>%
 #'  
 #' @param data_list A list, where each element represents a curve. Each curve is
 #'  defined as list with two entries:
@@ -58,11 +56,10 @@ funData2list <- function(data, norm = TRUE){
 #' @export
 list2funData <- function(data_list){
   argvals <- data_list[[1]]$t
-  obs <- data_list %>% 
-    purrr::map_dfc("x") %>% 
-    as.matrix() %>% 
-    t()
-  funData::funData(argvals = argvals, X = obs)
+  obs <- data_list |>
+    purrr::map_dfc("x") |>
+    as.matrix()
+  funData::funData(argvals = argvals, X = t(obs))
 }
 
 #' Convert \code{funData::irregFunData} objects into the right format.
@@ -80,14 +77,14 @@ list2funData <- function(data_list){
 #'  }
 #'  
 #' @references C. Happ-Kurz (2020) Object-Oriented Software for Functional Data. 
-#'  Journal of Statistical Software, 93(5): 1-38 .
+#'  Journal of Statistical Software, 93(5): 1-38.
 #' @export
 irregFunData2list <- function(data, norm = TRUE){
   t <- data@argvals
   x <- data@X
   
   data_list <- list()
-  if(norm) {
+  if (norm) {
     data_list <- purrr::map2(t, x, 
                              ~ list(t = (.x - min(.x)) / (max(.x) - min(.x)),
                                     x = .y))
@@ -99,8 +96,6 @@ irregFunData2list <- function(data, norm = TRUE){
 }
 
 #' Convert comprehensive lists into \code{funData::irregFunData} objects.
-#' 
-#' @importFrom magrittr %>%
 #'  
 #' @param data_list A list, where each element represents a curve. Each curve is
 #'  defined as list with two entries:
@@ -115,8 +110,8 @@ irregFunData2list <- function(data, norm = TRUE){
 #'  Journal of Statistical Software, 93(5): 1-38 .
 #' @export
 list2irregFunData <- function(data_list){
-  argvalsList <- data_list %>% purrr::map("t")
-  obsList <- data_list %>% purrr::map("x")
+  argvalsList <- data_list |> purrr::map("t")
+  obsList <- data_list |> purrr::map("x")
   funData::irregFunData(argvals = argvalsList, X = obsList)
 }
 
@@ -140,12 +135,12 @@ multiFunData2list <- function(data, norm = TRUE){
   
   data_list <- list()
   cpt <- 1
-  for(fun_data in data){
-    if(inherits(fun_data, 'funData')) {
+  for (fun_data in data) {
+    if (inherits(fun_data, 'funData')) {
       data_list[[cpt]] <- funData2list(fun_data, norm)
-    } else if(inherits(fun_data, 'irregFunData')) {
+    } else if (inherits(fun_data, 'irregFunData')) {
       data_list[[cpt]] <- irregFunData2list(fun_data, norm)
-    } else if(inherits(fun_data, 'multiFunData')){
+    } else if (inherits(fun_data, 'multiFunData')) {
       data_list[[cpt]] <- multiFunData2list(fun_data, norm)
     } else{
       stop('Something went wrong with one of the functional data object!')
@@ -171,7 +166,7 @@ multiFunData2list <- function(data, norm = TRUE){
 #'  Journal of Statistical Software, 93(5): 1-38 .
 #' @export
 checkData <- function(data){
-  if (inherits(data, 'funData')){
+  if (inherits(data, 'funData')) {
     data_ <- funData2list(data)
   } else if (inherits(data, 'irregFunData')) {
     data_ <- irregFunData2list(data)
@@ -200,15 +195,13 @@ checkData <- function(data){
 #' @export
 cai2list <- function(time, x, subject){
   results <- list()
-  for(zz in unique(subject)){
+  for (zz in unique(subject)) {
     results[[zz]] <- list(t = time[subject == zz], x = x[subject == zz])
   }
   results
 }
 
 #' Convert comprehensive lists into \code{ssfcov} objects.
-#' 
-#' @importFrom magrittr %>%
 #' 
 #' @param data A list, where each element represents a curve. Each curve is 
 #'  defined as a list with two entries:
@@ -229,7 +222,7 @@ cai2list <- function(time, x, subject){
 #'  Report).
 #' @export
 list2cai <- function(data){
-  data %>% purrr::map_dfr(~ data.frame(time = .x$t, x = .x$x), .id = 'obs')
+  data |> purrr::map_dfr(~ data.frame(time = .x$t, x = .x$x), .id = 'obs')
 }
 # ----
 
@@ -296,7 +289,7 @@ neighbors <- function(t, t0, h, k0){
 approx_2D <- function(x, y, xout){
   # Linear approximation for each rows
   rows <- matrix(0, ncol = length(xout), nrow = length(x))
-  for(i in 1:nrow(y)){
+  for (i in 1:nrow(y)) {
     rows[i, ] <- stats::approx(x, y[i, ],
                                xout = xout,
                                yleft = y[i, 1], 
@@ -304,7 +297,7 @@ approx_2D <- function(x, y, xout){
   }
   # Linear approximation for each columns
   cols <- matrix(0, ncol = length(xout), nrow = length(xout))
-  for(i in 1:ncol(rows)){
+  for (i in 1:ncol(rows)) {
     cols[, i] <- stats::approx(x, rows[, i], 
                                xout = xout,
                                yleft = rows[1, i], 

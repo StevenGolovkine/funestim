@@ -8,8 +8,6 @@
 #' local linear smoothers where the bandwidth is estimated using the 
 #' methodology from Golovkine et al. (2021).
 #' 
-#' @importFrom magrittr %>%
-#' 
 #' @param data A list, where each element represents a curve. Each curve have to
 #'  be defined as a list with two entries:
 #'  \itemize{
@@ -39,11 +37,11 @@
 #' @export
 mean_ll <- function(data, U = seq(0, 1, length.out = 101), t0_list = 0.5, 
                     grid = NULL, nb_obs_minimal = 2, kernel = 'epanechnikov'){
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_smooth <- smooth_curves(data, U = U, t0_list = t0_list, grid = grid,
                                nb_obs_minimal = nb_obs_minimal, kernel = kernel)
-  mu <- data_smooth$smooth %>% 
-    purrr::map_dfc(~ .x$x) %>% 
+  mu <- data_smooth$smooth |> 
+    purrr::map_dfc(~ .x$x) |> 
     rowMeans(na.rm = TRUE)
   list("parameter" = data_smooth$parameter, "mu" = mu)
 }
@@ -68,7 +66,7 @@ mean_ll <- function(data, U = seq(0, 1, length.out = 101), t0_list = 0.5,
 #' Statistics
 #' @export
 mean_ss <- function(data, U){
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_ <- list2cai(data)
   mod <- stats::smooth.spline(data_$time, data_$x)
   stats::predict(mod, U)$y
@@ -94,7 +92,7 @@ mean_ss <- function(data, U){
 #'  data and beyond, The Annals of Statistics
 #' @export
 mean_lll <- function(data, U) {
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_ <- list2cai(data)
   L3 <- fdapace::MakeFPCAInputs(IDs = data_$obs,
                                 tVec = data_$time,

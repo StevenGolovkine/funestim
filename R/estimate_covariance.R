@@ -8,7 +8,6 @@
 #' using local linear smoothers where the bandwidth is estimated using the 
 #' methodology from Golovkine et al. (2021).
 #' 
-#' @importFrom magrittr %>%
 #' @importFrom dplyr mutate filter
 #' 
 #' @param data A list, where each element represents a curve. Each curve have to
@@ -37,22 +36,22 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
                           centered = FALSE){
   # Inner function to compute the covariance on a particular point (s, t)
   gamma_st <- function(data, s0, t0, b, n_obs_min = 2){
-    data %>%
-      purrr::map(~ estimate_curve(.x, c(s0, t0), b, n_obs_min = n_obs_min)$x) %>% 
-      purrr::map_dbl(~ prod(.x)) %>% 
+    data |>
+      purrr::map(~ estimate_curve(.x, c(s0, t0), b, n_obs_min = n_obs_min)$x) |> 
+      purrr::map_dbl(~ prod(.x)) |> 
       mean(na.rm = TRUE)
   }
   
-  if(!centered){
+  if (!centered) {
     mean_global <- mean(purrr::map_dbl(data, ~ mean(.x$x)))
-    data <- data %>% purrr::map(~ list(t = .x$t, x = .x$x - mean_global))
+    data <- data |> purrr::map(~ list(t = .x$t, x = .x$x - mean_global))
   }
   
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   mu_estim <- mean_ll(data, U = U, t0_list = t0_list)
   
   # Estimation of the parameters
-  Mi <- data %>% purrr::map_dbl(~ length(.x$t))
+  Mi <- data |> purrr::map_dbl(~ length(.x$t))
   data_presmooth <- presmoothing(data, t0_list, gamma = 0.5)
   sigma_estim <- max(estimate_sigma(data, t0_list, k0_list = 2))
   H0_estim <- estimate_H0(data_presmooth)
@@ -62,7 +61,7 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
   
   # Estimate the bandwidth on t0_list
   zz <- tidyr::expand_grid(s = t0_list, t = t0_list)
-  zz <- zz %>% 
+  zz <- zz |> 
     dplyr::mutate(
       is_upper = t <= s,
       H0_s = rep(H0_estim, each = length(t0_list)),
@@ -74,8 +73,8 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
       var_st = var_st
     )
   
-  zz_nodiag <- zz %>% 
-    dplyr::filter(is_upper) %>% 
+  zz_nodiag <- zz |> 
+    dplyr::filter(is_upper) |> 
     dplyr::mutate(b = purrr::pmap_dbl(
       list(s, t, 
            H0_s, H0_t,
@@ -102,9 +101,9 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
   bb_large <- approx_2D(t0_list, bb, U)
   
   cov_df <- tidyr::expand_grid(s = U, t = U)
-  cov_df <- cov_df %>% 
-    dplyr::mutate(is_upper = t <= s, b = as.vector(bb_large)) %>%
-    dplyr::filter(is_upper) %>% 
+  cov_df <- cov_df |> 
+    dplyr::mutate(is_upper = t <= s, b = as.vector(bb_large)) |>
+    dplyr::filter(is_upper) |> 
     dplyr::mutate(cov = purrr::pmap_dbl(list(s, t, b), gamma_st, 
                                         data = data, n_obs_min = 2))
 
@@ -114,11 +113,11 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
   # Create the final covariance
   res <- matrix(0, nrow = length(U), ncol = length(U))
   res[upper.tri(res, diag = TRUE)] <- cov_df$cov - prod_mu
-  for(t in 1:ncol(res)){
+  for (t in 1:ncol(res)) {
     s <- 1
     current_cov <- res[s, t - s + 1]
-    while(s <= (t - s + 1)){
-      if(abs(U[s] - U[t - s + 1]) > bb_large[s, t - s + 1]) {
+    while (s <= (t - s + 1)) {
+      if (abs(U[s] - U[t - s + 1]) > bb_large[s, t - s + 1]) {
         current_cov <- res[s, t - s + 1]
       } else {
         res[s, t - s + 1] <- current_cov 
@@ -126,11 +125,11 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
       s <- s + 1
     }
   }
-  for(s in 1:nrow(res)){
+  for (s in 1:nrow(res)) {
     t <- ncol(res)
     current_cov <- res[ncol(res) + s - t, t]
-    while(t >= (ncol(res) + s - t)){
-      if(abs(U[ncol(res) + s - t] - U[t]) > bb_large[ncol(res) + s - t, t]) {
+    while (t >= (ncol(res) + s - t)) {
+      if (abs(U[ncol(res) + s - t] - U[t]) > bb_large[ncol(res) + s - t, t]) {
         current_cov <- res[ncol(res) + s - t, t]
       } else {
         res[ncol(res) + s - t, t] <- current_cov 
@@ -171,7 +170,7 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
 covariance_ss <- function(data, U, nbasis = 5, centered = FALSE, nodiag = TRUE){
   predict_ssanova <- utils::getFromNamespace("predict.ssanova", "gss")
   
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_ <- list2cai(data)
   time <- data_$time
   x <- data_$x
@@ -182,13 +181,13 @@ covariance_ss <- function(data, U, nbasis = 5, centered = FALSE, nodiag = TRUE){
     x <- x - stats::fitted(fit)
   }
   gg <- NULL
-  for(zz in unique(subject)) {
-    if(sum(subject == zz) > 1) {
+  for (zz in unique(subject)) {
+    if (sum(subject == zz) > 1) {
       tt <- time[subject == zz]
       xx <- x[subject == zz]
       g <- expand.grid(t1 = tt, t2 = tt)
       scov <- xx %*% t(xx)
-      if(nodiag) scov <- scov + diag(rep(Inf, length(xx)))
+      if (nodiag) scov <- scov + diag(rep(Inf, length(xx)))
       g$z <- matrix(scov, ncol = 1)
       gg <- rbind(gg, g[g$z < Inf, ])
     }
@@ -228,7 +227,7 @@ covariance_ss <- function(data, U, nbasis = 5, centered = FALSE, nodiag = TRUE){
 #'  data and beyond, The Annals of Statistics
 #' @export
 covariance_lll <- function(data, U, b = 0.1){
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_ <- list2cai(data)
   L3 <- fdapace::MakeFPCAInputs(IDs = data_$obs, 
                                 tVec = data_$time, 

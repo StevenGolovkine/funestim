@@ -31,7 +31,13 @@ mu <- learn_mean(powerconsumption)
 cov <- learn_covariance(powerconsumption)
 noise <- learn_noise(powerconsumption)
 
-X <- generate_data(100, 100, mu, cov, noise, exp(-5.5), 0.2, 1)
+grid <- seq(0, 1, length.out = 101)
+X <- generate_data(n = 100, m = 100, 
+                   model_mean = mu, covariance = cov, 
+                   model_noise = noise, 
+                   lambda = exp(-5.5), 
+                   ti = NULL, grid = grid,
+                   p = 0.2, k = 1)
 ```
 
 We perform an estimation of the mean curve.
@@ -44,7 +50,7 @@ mean_curve <- mean_ll(X, U = obs_points, t0_list = band_points)
 
 ```{r plot_mean, echo=FALSE, fig.height=4.35, fig.width=7}
 plot(NULL, xlim = c(0, 1), ylim = c(230, 250), xlab = '', ylab = '')
-for(i in 1:35){
+for (i in 1:35) {
   lines(X[[i]]$t, X[[i]]$x, col = i)
 }
 lines(obs_points, mean_curve$mu, col = 'red', lwd = 4)
