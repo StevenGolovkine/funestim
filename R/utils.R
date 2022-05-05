@@ -13,29 +13,26 @@
 #' 
 #' @param data An object of the class \code{funData::funData}.
 #' @param norm Boolean, if TRUE, the sampling points are normalized on 
-#'  \eqn{[0, 1]}.
+#' \eqn{[0, 1]}.
 #' 
 #' @return A list, where each element represents a curve. Each curve is defined
-#'  as a list with two entries:
+#' as a list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points
 #'  }
 #'  
 #' @references C. Happ-Kurz (2020) Object-Oriented Software for Functional Data. 
-#'  Journal of Statistical Software, 93(5): 1-38 .
+#' Journal of Statistical Software, 93(5): 1-38 .
 #' @export
 funData2list <- function(data, norm = TRUE){
   t <- funData::argvals(data)[[1]]
   x <- funData::X(data)
   
-  data_list <- list()
-  for (i in 1:funData::nObs(data)) {
+  lapply(1:funData::nObs(data), function(idx) {
     if (norm) t <- (t - min(t)) / (max(t) - min(t))
-    data_list[[i]] <- list(t = t, x = x[i,])
-  }
-  
-  data_list
+    list(t = t, x = x[idx,])
+  })
 }
 
 #' Convert comprehensive lists into \code{funData::funData} objects.
@@ -43,22 +40,20 @@ funData2list <- function(data, norm = TRUE){
 #' We assume that we \strong{know} that the curves are on the same interval.
 #'  
 #' @param data_list A list, where each element represents a curve. Each curve is
-#'  defined as list with two entries:
-#'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points
-#'  }
+#' defined as list with two entries:
+#' \itemize{
+#'  \item \strong{$t} Sampling points
+#'  \item \strong{$x} Observed points
+#' }
 #'   
 #' @return An object of the class \code{funData::funData}.
 #' 
 #' @references C. Happ-Kurz (2020) Object-Oriented Software for Functional Data. 
-#'  Journal of Statistical Software, 93(5): 1-38 .
+#' Journal of Statistical Software, 93(5): 1-38 .
 #' @export
 list2funData <- function(data_list){
   argvals <- data_list[[1]]$t
-  obs <- data_list |>
-    purrr::map_dfc("x") |>
-    as.matrix()
+  obs <- data_list |> sapply(function(curve) curve$x)
   funData::funData(argvals = argvals, X = t(obs))
 }
 
@@ -66,52 +61,46 @@ list2funData <- function(data_list){
 #' 
 #' @param data An object of the class \code{funData::irregFunData}.
 #' @param norm Boolean, if TRUE, the sampling points are normalized on 
-#'  \eqn{[0, 1]}
+#' \eqn{[0, 1]}.
 #' 
 #' @return A list, where each element represents a curve. Each curve is defined
-#'  as a list with two entries:
+#' as a list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item
-#'    \strong{$x} The observed points
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points
 #'  }
 #'  
 #' @references C. Happ-Kurz (2020) Object-Oriented Software for Functional Data. 
-#'  Journal of Statistical Software, 93(5): 1-38.
+#' Journal of Statistical Software, 93(5): 1-38.
 #' @export
 irregFunData2list <- function(data, norm = TRUE){
   t <- data@argvals
   x <- data@X
   
-  data_list <- list()
-  if (norm) {
-    data_list <- purrr::map2(t, x, 
-                             ~ list(t = (.x - min(.x)) / (max(.x) - min(.x)),
-                                    x = .y))
-  } else {
-    data_list <- purrr::map2(t, x, ~ list(t = .x, x = .y))
-  }
-  
-  data_list
+  lapply(1:funData::nObs(data), function(idx) {
+    t_cur <- t[[idx]]
+    if (norm) t_cur <- (t_cur - min(t_cur)) / (max(t_cur) - min(t_cur))
+    list(t = t_cur, x = x[[idx]])
+  })
 }
 
 #' Convert comprehensive lists into \code{funData::irregFunData} objects.
 #'  
 #' @param data_list A list, where each element represents a curve. Each curve is
-#'  defined as list with two entries:
+#' defined as list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points
 #'  }
 #'   
 #' @return  An object of the class \code{funData::irregFunData}
 #' 
 #' @references C. Happ-Kurz (2020) Object-Oriented Software for Functional Data. 
-#'  Journal of Statistical Software, 93(5): 1-38 .
+#' Journal of Statistical Software, 93(5): 1-38 .
 #' @export
 list2irregFunData <- function(data_list){
-  argvalsList <- data_list |> purrr::map("t")
-  obsList <- data_list |> purrr::map("x")
+  argvalsList <- data_list |> sapply(function(curve) curve$t)
+  obsList <- data_list |> sapply(function(curve) curve$x)
   funData::irregFunData(argvals = argvalsList, X = obsList)
 }
 
@@ -119,20 +108,19 @@ list2irregFunData <- function(data_list){
 #' 
 #' @param data An object of the class \code{funData::multiFunData}.
 #' @param norm Boolean, if TRUE, the sampling points are normalized on 
-#'  \eqn{[0, 1]}.
+#' \eqn{[0, 1]}.
 #'
 #' @return A list, where each element represents a curve. Each curve is defined
-#'  as a list with two entries:
+#' as a list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points
 #'  }
 #' 
 #' @references C. Happ-Kurz (2020) Object-Oriented Software for Functional Data. 
-#'  Journal of Statistical Software, 93(5): 1-38 .
+#' Journal of Statistical Software, 93(5): 1-38 .
 #' @export
 multiFunData2list <- function(data, norm = TRUE){
-  
   data_list <- list()
   cpt <- 1
   for (fun_data in data) {
@@ -153,17 +141,17 @@ multiFunData2list <- function(data, norm = TRUE){
 #' Check the input data and return a list in the right format.
 #' 
 #' @param data An object from the package \code{funData}. It could be a 
-#'  \code{funData::funData} or \code{funData::irregFunData} object.
+#' \code{funData::funData} or \code{funData::irregFunData} object.
 #' 
 #' @return A list, where each element represents a curve. Each curve is defined 
-#'  as a list with two entries:
+#' as a list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points
 #'  }
 #' 
 #' @references C. Happ-Kurz (2020) Object-Oriented Software for Functional Data. 
-#'  Journal of Statistical Software, 93(5): 1-38 .
+#' Journal of Statistical Software, 93(5): 1-38 .
 #' @export
 checkData <- function(data){
   if (inherits(data, 'funData')) {
@@ -183,38 +171,37 @@ checkData <- function(data){
 #' @param subject Vector, observation id.
 #' 
 #' @return A list, where each element represents a curve. Each curve is defined
-#'  as a list with two entries:
+#' as a list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points
 #'  }
 #'  
 #' @references ssfcov, R package. See Cai and Yuan, Nonparametric Covariance
-#'  Function Estimation for Functional and Longitudinal Data - 2010 (Technical
-#'  Report).
+#' Function Estimation for Functional and Longitudinal Data - 2010 (Technical
+#' Report).
 #' @export
 cai2list <- function(time, x, subject){
-  results <- list()
-  for (zz in unique(subject)) {
-    results[[zz]] <- list(t = time[subject == zz], x = x[subject == zz])
-  }
-  results
+  seq_along(unique(subject)) |>
+    lapply(function(idx) {
+      list(t = time[subject == idx], x = x[subject == idx])
+    })
 }
 
 #' Convert comprehensive lists into \code{ssfcov} objects.
 #' 
 #' @param data A list, where each element represents a curve. Each curve is 
-#'  defined as a list with two entries:
+#' defined as a list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points
 #'  }
 #'
 #' @return A dataframe where the columns are:
 #'  \itemize{
-#'   \item \strong{$time} The observation times.
-#'   \item \strong{x} The observation values.
-#'   \item \strong{subject} The observation id.
+#'   \item \strong{time} Observation times.
+#'   \item \strong{x} Observation values.
+#'   \item \strong{subject} Observation id.
 #'  }
 #'  
 #' @references ssfcov, R package. See Cai and Yuan, Nonparametric Covariance
@@ -222,7 +209,11 @@ cai2list <- function(time, x, subject){
 #'  Report).
 #' @export
 list2cai <- function(data){
-  data |> purrr::map_dfr(~ data.frame(time = .x$t, x = .x$x), .id = 'obs')
+  seq_along(data) |> 
+    lapply(function(idx) {
+      data.frame(obs = idx, time = data[[idx]]$t, x = data[[idx]]$x)
+    }) |> 
+    (\(x) do.call("rbind", x))()
 }
 # ----
 
@@ -245,9 +236,9 @@ lseq <- function(from = 1, to = 100, length.out = 51) {
 #' @param u Vector, points to estimate the kernel.
 #' @param type Integer, used kernel. 
 #'  \itemize{
-#'   \item \strong{1} Uniform kernel
-#'   \item \strong{2} Epanechnikov kernel
-#'   \item \strong{3} Biweight kernel
+#'   \item \strong{1} uniform kernel
+#'   \item \strong{2} epanechnikov kernel
+#'   \item \strong{3} biweight kernel
 #'  }
 #'  
 #' @return Vector, the evaluated kernel.
@@ -265,10 +256,10 @@ kernel <- function(u, type = 1){
 #' Test if there are more than \eqn{k_0} points, defined by \eqn{t}, in the 
 #' neighborhood of \eqn{t_0}, defined by the bandwidth \eqn{h}.
 #' 
-#' @param t Vector, the sampling points.
-#' @param t0 Numeric, the estimation point.
-#' @param h Numeric, the bandwidth.
-#' @param k0 Numeric, the number of points to be in the neighborhood.
+#' @param t Vector, sampling points.
+#' @param t0 Numeric, estimation point.
+#' @param h Numeric, bandwidth.
+#' @param k0 Numeric, number of points to be in the neighborhood.
 #' 
 #' @return Boolean, true if there are enough points in the neighborhood.
 #' @export
