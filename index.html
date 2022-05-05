@@ -23,6 +23,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -35,18 +37,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">funestim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/funestim.html">Get started</a>
 </li>
@@ -56,7 +52,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/StevenGolovkine/funestim/">
+  <a href="https://github.com/StevenGolovkine/funestim/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -73,16 +69,15 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="funestim" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#funestim" class="anchor"></a>funestim</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="funestim">funestim<a class="anchor" aria-label="anchor" href="#funestim"></a>
+</h1></div>
 <!-- badges: start -->
-
 <p><code>funestim</code> is an <code>R</code>-package that allows users to estimate the mean and the covariance of a functional dataset using an estimation of the regularity of the curves. The curves can be irregularly sampled.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>To install the latest version directly from <a href="https://github.com/">GitHub</a>, please use</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>To install the latest version directly from <a href="https://github.com/" class="external-link">GitHub</a>, please use</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"StevenGolovkine/funestim"</span><span class="op">)</span></code></pre></div>
@@ -91,67 +86,78 @@
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"StevenGolovkine/funestim"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="dependencies" class="section level2">
-<h2 class="hasAnchor">
-<a href="#dependencies" class="anchor"></a>Dependencies</h2>
-<p>The <code>funestim</code> package depends on the <code>R</code>-packages <a href="https://CRAN.R-project.org/package=dplyr"><code>dplyr</code></a>, <a href="https://CRAN.R-project.org/package=fdapace"><code>fdapace</code></a>, <a href="https://github.com/ClaraHapp/funData"><code>funData</code></a>, <a href="https://CRAN.R-project.org/package=gss"><code>gss</code></a>, <a href="https://CRAN.R-project.org/package=KernSmooth"><code>KernSmooth</code></a>, <a href="https://CRAN.R-project.org/package=magrittr"><code>magrittr</code></a>, <a href="https://CRAN.R-project.org/package=MASS"><code>MASS</code></a>, <a href="https://CRAN.R-project.org/package=purrr"><code>purrr</code></a>, <a href="https://CRAN.R-project.org/package=Rcpp"><code>Rcpp</code></a> and <a href="https://CRAN.R-project.org/package=RcppArmadillo"><code>RcppArmadillo</code></a>, <a href="https://CRAN.R-project.org/package=tidyr"><code>tidyr</code></a>,</p>
+<div class="section level2">
+<h2 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
+</h2>
+<p>The <code>funestim</code> package depends on the <code>R</code>-packages <a href="https://CRAN.R-project.org/package=dplyr" class="external-link"><code>dplyr</code></a>, <a href="https://CRAN.R-project.org/package=fdapace" class="external-link"><code>fdapace</code></a>, <a href="https://github.com/ClaraHapp/funData" class="external-link"><code>funData</code></a>, <a href="https://CRAN.R-project.org/package=gss" class="external-link"><code>gss</code></a>, <a href="https://CRAN.R-project.org/package=KernSmooth" class="external-link"><code>KernSmooth</code></a>, <a href="https://CRAN.R-project.org/package=magrittr" class="external-link"><code>magrittr</code></a>, <a href="https://CRAN.R-project.org/package=MASS" class="external-link"><code>MASS</code></a>, <a href="https://CRAN.R-project.org/package=purrr" class="external-link"><code>purrr</code></a>, <a href="https://CRAN.R-project.org/package=Rcpp" class="external-link"><code>Rcpp</code></a> and <a href="https://CRAN.R-project.org/package=RcppArmadillo" class="external-link"><code>RcppArmadillo</code></a>, <a href="https://CRAN.R-project.org/package=tidyr" class="external-link"><code>tidyr</code></a>,</p>
 </div>
-<div id="references" class="section level2">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <p>The theoretical foundations of the estimation of the mean and covariance functions are described in:</p>
 <p>Golovkine S., Klutchnikoff N., Patilea V. (2021) - Adaptive estimation of irregular mean and covariance functions.</p>
 </div>
-<div id="bug-reports" class="section level2">
-<h2 class="hasAnchor">
-<a href="#bug-reports" class="anchor"></a>Bug reports</h2>
-<p>Please use <a href="https://github.com/StevenGolovkine/simulater/issues">GitHub issues</a> for reporting bugs or issues.</p>
+<div class="section level2">
+<h2 id="bug-reports">Bug reports<a class="anchor" aria-label="anchor" href="#bug-reports"></a>
+</h2>
+<p>Please use <a href="https://github.com/StevenGolovkine/simulater/issues" class="external-link">GitHub issues</a> for reporting bugs or issues.</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/StevenGolovkine/funestim/">https://​github.com/​StevenGolovkine/​funestim/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/StevenGolovkine/funestim/issues">https://​github.com/​StevenGolovkine/​funestim/​issues</a>
-</li>
+<li><a href="https://github.com/StevenGolovkine/funestim/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/StevenGolovkine/funestim/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing funestim</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Steven Golovkine <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.com/StevenGolovkine/funestim"><img src="https://travis-ci.com/StevenGolovkine/funestim.svg?branch=master" alt="Build Status"></a></li>
-<li><a href="https://www.codacy.com/gh/StevenGolovkine/funestim/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StevenGolovkine/funestim&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/645f6c4a3f8548219ef4cfc8ea74e361" alt="Codacy Badge"></a></li>
-<li><a href="https://zenodo.org/badge/latestdoi/362427640"><img src="https://zenodo.org/badge/362427640.svg" alt="DOI"></a></li>
+<li><a href="https://travis-ci.com/StevenGolovkine/funestim" class="external-link"><img src="https://travis-ci.com/StevenGolovkine/funestim.svg?branch=master" alt="Build Status"></a></li>
+<li><a href="https://www.codacy.com/gh/StevenGolovkine/funestim/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=StevenGolovkine/funestim&amp;utm_campaign=Badge_Grade" class="external-link"><img src="https://app.codacy.com/project/badge/Grade/645f6c4a3f8548219ef4cfc8ea74e361" alt="Codacy Badge"></a></li>
+<li><a href="https://zenodo.org/badge/latestdoi/362427640" class="external-link"><img src="https://zenodo.org/badge/362427640.svg" alt="DOI"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Steven Golovkine.</p>
+  <p></p>
+<p>Developed by Steven Golovkine.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
@@ -159,6 +165,8 @@
 
   
 
+
+  
 
   </body>
 </html>
