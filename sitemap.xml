@@ -31,10 +31,22 @@
     <loc>/reference/checkData.html</loc>
   </url>
   <url>
+    <loc>/reference/covariance_ll.html</loc>
+  </url>
+  <url>
+    <loc>/reference/covariance_lll.html</loc>
+  </url>
+  <url>
+    <loc>/reference/covariance_ss.html</loc>
+  </url>
+  <url>
     <loc>/reference/estimate_bandwidth_covariance.html</loc>
   </url>
   <url>
     <loc>/reference/estimate_bandwidth_mean.html</loc>
+  </url>
+  <url>
+    <loc>/reference/estimate_bandwidths_covariance.html</loc>
   </url>
   <url>
     <loc>/reference/estimate_bandwidths_mean.html</loc>
@@ -52,7 +64,10 @@
     <loc>/reference/estimate_moment.html</loc>
   </url>
   <url>
-    <loc>/reference/estimate_parameters.html</loc>
+    <loc>/reference/estimate_parameters_covariance.html</loc>
+  </url>
+  <url>
+    <loc>/reference/estimate_parameters_mean.html</loc>
   </url>
   <url>
     <loc>/reference/estimate_parameters_recursion.html</loc>
@@ -79,7 +94,7 @@
     <loc>/reference/irregFunData2list.html</loc>
   </url>
   <url>
-    <loc>/reference/kernel.html</loc>
+    <loc>/reference/kernel_f.html</loc>
   </url>
   <url>
     <loc>/reference/list2cai.html</loc>
@@ -110,6 +125,9 @@
   </url>
   <url>
     <loc>/reference/presmoothing.html</loc>
+  </url>
+  <url>
+    <loc>/reference/smooth_curves_covariance.html</loc>
   </url>
   <url>
     <loc>/reference/smooth_curves_mean.html</loc>

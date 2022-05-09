@@ -67,7 +67,7 @@ estimation of the regularity.</p>
   <span class="va">curves</span>,
   point <span class="op">=</span> <span class="fl">0.5</span>,
   delta_f <span class="op">=</span> <span class="cn">NULL</span>,
-  kernel <span class="op">=</span> <span class="st">"epanechnikov"</span>,
+  kernel_name <span class="op">=</span> <span class="st">"epanechnikov"</span>,
   beta <span class="op">=</span> <span class="fl">1</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -84,7 +84,7 @@ be defined as a list with two entries:</p><ul><li><p><strong>$t</strong> The sam
 pre-smoothed.</p></dd>
 <dt>delta_f</dt>
 <dd><p>Function (default = NULL), function to determine the delta.</p></dd>
-<dt>kernel</dt>
+<dt>kernel_name</dt>
 <dd><p>String (default = 'epanechnikov'), the kernel used for the
 estimation:</p><ul><li><p>epanechnikov</p></li>
 <li><p>uniform</p></li>
@@ -97,10 +97,12 @@ time differentiable curves.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>List, with four entries:</p><ul><li><p><strong>$point</strong> Time point where the smoothing has been done.</p></li>
+    <p>List, with six entries:</p><ul><li><p><strong>$point</strong> Time point where the smoothing has been done.</p></li>
+<li><p><strong>$curves</strong> Smoothed curves</p></li>
 <li><p><strong>$H</strong> Estimated regularity.</p></li>
 <li><p><strong>$L</strong> Estimated constant.</p></li>
 <li><p><strong>$var</strong> Estimated variance.</p></li>
+<li><p><strong>$mom</strong> Estimated \(E(X^{2}_{t_0})\)</p></li>
 </ul></div>
     <div id="references">
     <h2>References</h2>

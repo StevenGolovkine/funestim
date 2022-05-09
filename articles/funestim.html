@@ -69,7 +69,7 @@
       <h1 data-toc-skip>Introduction to funestim</h1>
                         <h4 data-toc-skip class="author">Steven Golovkine</h4>
             
-            <h4 data-toc-skip class="date">2022-05-05</h4>
+            <h4 data-toc-skip class="date">2022-05-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/StevenGolovkine/funestim/blob/HEAD/vignettes/funestim.Rmd" class="external-link"><code>vignettes/funestim.Rmd</code></a></small>
       <div class="hidden name"><code>funestim.Rmd</code></div>
@@ -82,11 +82,6 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Load the packages</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/StevenGolovkine/funestim" class="external-link">funestim</a></span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'funestim'</span>
-<span class="co">#&gt; The following object is masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     kernel</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/StevenGolovkine/simulater" class="external-link">simulater</a></span><span class="op">)</span></code></pre></div>
 <p>First, we will generate some data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -104,17 +99,24 @@
 <p>We perform an estimation of the mean curve.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">obs_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">101</span><span class="op">)</span>  <span class="co"># Estimation grid mean</span>
-<span class="va">band_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.95</span>, length.out <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="co"># Estimation grid regularity</span>
+<span class="va">band_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span> <span class="co"># Estimation grid regularity</span>
 <span class="va">delta_f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">**</span><span class="fl">0.5</span><span class="op">)</span>
 <span class="va">mean_curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mean_ll.html">mean_ll</a></span><span class="op">(</span><span class="va">X</span>, grid <span class="op">=</span> <span class="va">obs_points</span>,
                       grid_param <span class="op">=</span> <span class="va">band_points</span>, delta_f <span class="op">=</span> <span class="va">delta_f</span><span class="op">)</span></code></pre></div>
 <p><img src="funestim_files/figure-html/plot_mean-1.png" width="672"></p>
 <p>We perform an estimation of the covariance surface.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">#obs_points &lt;- seq(0, 1, length.out = 101)  # Estimation grid mean</span>
-<span class="co">#band_points &lt;- seq(0.05, 0.95, length.out = 10) # Estimation grid regularity</span>
-<span class="co">#cov_our &lt;- covariance_ll(X, U = obs_points, t0_list = band_points, </span>
-<span class="co">#                         centered = FALSE)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">obs_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">101</span><span class="op">)</span>  <span class="co"># Estimation grid mean</span>
+<span class="va">band_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span> <span class="co"># Estimation grid regularity</span>
+<span class="va">delta_f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">**</span><span class="fl">0.5</span><span class="op">)</span>
+<span class="va">cov_our</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/covariance_ll.html">covariance_ll</a></span><span class="op">(</span><span class="va">X</span>, grid <span class="op">=</span> <span class="va">obs_points</span>, 
+                         grid_param <span class="op">=</span> <span class="va">band_points</span>,
+                         grid_bandwidth <span class="op">=</span> <span class="cn">NULL</span>,
+                         center <span class="op">=</span> <span class="cn">TRUE</span>,
+                         delta_f <span class="op">=</span> <span class="va">delta_f</span>,
+                         n_obs_min <span class="op">=</span> <span class="fl">2</span>,
+                         kernel_name <span class="op">=</span> <span class="st">'epanechnikov'</span><span class="op">)</span></code></pre></div>
+<p><img src="funestim_files/figure-html/plot_cov-1.png" width="672"></p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

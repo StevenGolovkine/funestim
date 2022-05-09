@@ -56,51 +56,44 @@ regression estimator defined over continuous data.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">estimate_bandwidth_covariance</span><span class="op">(</span>
-  <span class="va">data</span>,
-  <span class="va">s0</span>,
-  <span class="va">t0</span>,
-  H0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
-  L0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,
-  moment2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,
+  <span class="va">curves</span>,
+  <span class="va">params</span>,
   sigma <span class="op">=</span> <span class="fl">0</span>,
-  variance <span class="op">=</span> <span class="fl">0</span>,
-  grid <span class="op">=</span> <span class="cn">NULL</span>,
-  nb_obs_minimal <span class="op">=</span> <span class="fl">2</span>,
-  type_k <span class="op">=</span> <span class="fl">2</span>
+  grid_bandwidth <span class="op">=</span> <span class="fu"><a href="lseq.html">lseq</a></span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">0.1</span>, length.out <span class="op">=</span> <span class="fl">101</span><span class="op">)</span>,
+  n_obs_min <span class="op">=</span> <span class="fl">2</span>,
+  kernel_name <span class="op">=</span> <span class="st">"epanechnikov"</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>data</dt>
+    <dl><dt>params</dt>
+<dd><p>List, estimation of the different parameters for the data
+points pair to estimate:</p><ul><li><p><strong>$point</strong> Time point where the smoothing has been done.</p></li>
+<li><p><strong>$H</strong> Estimated regularity.</p></li>
+<li><p><strong>$L</strong> Estimated constant.</p></li>
+<li><p><strong>$var</strong> Estimated variance.</p></li>
+<li><p><strong>$mom</strong> Estimated \(E(X^{2}_{t_0})\).</p></li>
+<li><p><strong>$var_st</strong> Estimated \(E(X^{2}_{t_0})\).</p></li>
+</ul></dd>
+<dt>sigma</dt>
+<dd><p>Numeric, estimation of the std of the noise \(\sigma\).</p></dd>
+<dt>grid_bandwidth</dt>
+<dd><p>Vector (default = lseq(0.001, 0.1, length.out = 101)),
+grid of bandwidths.</p></dd>
+<dt>n_obs_min</dt>
+<dd><p>Integer (default = 2), minimum number of points in the
+neighborhood to keep the curve in the estimation.</p></dd>
+<dt>kernel_name</dt>
+<dd><p>String (default = 'epanechnikov'), the kernel used for the
+estimation:</p><ul><li><p>epanechnikov</p></li>
+<li><p>uniform</p></li>
+<li><p>biweight</p></li>
+</ul></dd>
+<dt>data</dt>
 <dd><p>A list, where each element represents a curve. Each curve have to
 be defined as a list with two entries:</p><ul><li><p><strong>$t</strong> The sampling points</p></li>
 <li><p><strong>$x</strong> The observed points.</p></li>
-</ul></dd>
-<dt>s0</dt>
-<dd><p>Numeric, the sampling point at which we estimate the bandwidth.</p></dd>
-<dt>t0</dt>
-<dd><p>Numeric, the sampling point at which we estimate the bandwidth.</p></dd>
-<dt>H0</dt>
-<dd><p>Vector, an estimation of \(H_0\) at \(s_0\) and \(t_0\).</p></dd>
-<dt>L0</dt>
-<dd><p>Vector, an estimation of \(L_0\) at \(s_0\) and \(t_0\).</p></dd>
-<dt>moment2</dt>
-<dd><p>Vector, an estimation of \(EX^2\) at \(s_0\) and \(t_0\).</p></dd>
-<dt>sigma</dt>
-<dd><p>Numeric, an estimation of \(\sigma\).</p></dd>
-<dt>variance</dt>
-<dd><p>Numeric, an estimation of \(Var(X_{s_0}X_{t_0)}\).</p></dd>
-<dt>grid</dt>
-<dd><p>Vector, default=lseq(0.001, 0.1, length.out = 101). A grid of
-bandwidths.</p></dd>
-<dt>nb_obs_minimal</dt>
-<dd><p>Integer, default=2. Minimum number of points in the
-neighborhood to keep the curve in the estimation.</p></dd>
-<dt>type_k</dt>
-<dd><p>Integer, default=2. Used kernel.</p><ul><li><p><strong>1</strong> Uniform kernel</p></li>
-<li><p><strong>2</strong> Epanechnikov kernel</p></li>
-<li><p><strong>3</strong> Biweight kernel</p></li>
 </ul></dd>
 </dl></div>
     <div id="value">
