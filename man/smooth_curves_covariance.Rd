@@ -6,12 +6,12 @@
 \usage{
 smooth_curves_covariance(
   curves,
-  grid = NULL,
+  grid = seq(0, 1, length.out = 101),
   grid_param = c(0.25, 0.5, 0.75),
   grid_bandwidth = NULL,
   delta_f = NULL,
-  kernel_name = "epanechnikov",
-  n_obs_min = 2
+  n_obs_min = 2,
+  kernel_name = "epanechnikov"
 )
 }
 \arguments{
@@ -22,9 +22,8 @@ be defined as a list with two entries:
 \item \strong{$x} Observed points.
 }}
 
-\item{grid}{Vector (default = NULL), sampling points at which estimate the
-curves. If NULL, the sampling points for the estimation are the same than the
-observed ones.}
+\item{grid}{Vector (default = seq(0, 1, length.out = 101)), sampling points
+at which estimate the curves.}
 
 \item{grid_param}{Vector (default = c(0.25, 0.5, 0.75)), sampling points at
 which we estimate the parameters.}
@@ -33,6 +32,9 @@ which we estimate the parameters.}
 
 \item{delta_f}{Function (default = NULL), function to determine the delta.}
 
+\item{n_obs_min}{Integer (default = 2), minimum number of observation for
+the smoothing.}
+
 \item{kernel_name}{String (default = 'epanechnikov'), the kernel used for the
 estimation:
 \itemize{
@@ -40,12 +42,9 @@ estimation:
 \item uniform
 \item biweight
 }}
-
-\item{n_obs_min}{Integer (default = 2), minimum number of observation for
-the smoothing.}
 }
 \value{
-A list, which contains two elements. The first one is a list which
+A list, which contains three elements. The first one is a list which
 contains the estimated parameters:
 \itemize{
 \item \strong{sigma} Estimation of the standard deviation of the noise.
@@ -54,11 +53,8 @@ contains the estimated parameters:
 \item \strong{L0} Estimation of \eqn{L_0}.
 \item \strong{bandwidth} Estimation of the bandwidth.
 }
-The second one is another list which contains the estimation of the curves:
-\itemize{
-\item \strong{$t} Sampling points.
-\item \strong{$x} Estimated points.
-}
+The second one is the bandwidths matrix. And the last one is the estimation
+of the covariance.
 }
 \description{
 This function performs a non-parametric smoothing of a set of curves using

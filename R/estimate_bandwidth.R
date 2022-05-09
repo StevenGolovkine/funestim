@@ -180,7 +180,7 @@ estimate_bandwidths_mean <- function(
 #'
 #' @family estimate bandwidth
 #' 
-#' @param data A list, where each element represents a curve. Each curve have to
+#' @param curves List, where each element represents a curve. Each curve have to
 #'  be defined as a list with two entries:
 #'  \itemize{
 #'   \item \strong{$t} The sampling points

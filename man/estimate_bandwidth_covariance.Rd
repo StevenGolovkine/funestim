@@ -14,6 +14,13 @@ estimate_bandwidth_covariance(
 )
 }
 \arguments{
+\item{curves}{List, where each element represents a curve. Each curve have to
+be defined as a list with two entries:
+\itemize{
+\item \strong{$t} The sampling points
+\item \strong{$x} The observed points.
+}}
+
 \item{params}{List, estimation of the different parameters for the data
 points pair to estimate:
 \itemize{
@@ -39,13 +46,6 @@ estimation:
 \item epanechnikov
 \item uniform
 \item biweight
-}}
-
-\item{data}{A list, where each element represents a curve. Each curve have to
-be defined as a list with two entries:
-\itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points.
 }}
 }
 \value{

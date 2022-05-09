@@ -8,8 +8,6 @@
 #' using local linear smoothers where the bandwidth is estimated using the
 #' methodology from Golovkine et al. (2021).
 #'
-#' @importFrom dplyr mutate filter
-#'
 #' @param curves List, where each element represents a curve. Each curve have to
 #' be defined as a list with two entries:
 #'  \itemize{
@@ -20,13 +18,13 @@
 #' at which estimate the curves.
 #' @param grid_param Vector (default = seq(0.1, 0.9, by = 0.1)), the sampling
 #' points at which we estimate the parameters.
-#' @param grid_bandwidth Vector (default = NULL), grid of bandwidths. -> MEAN
+#' @param grid_bandwidth Vector (default = NULL), grid of bandwidths.
 #' @param center Boolean (default = TRUE), center the data?
-#' @param delta_f Function (default = NULL), function to determine the delta. -> MEAN
+#' @param delta_f Function (default = NULL), function to determine the delta.
 #' @param n_obs_min Integer (default = 2), minimum number of observation for the
-#' smoothing. -> MEAN
+#' smoothing.
 #' @param kernel_name String (default = 'epanechnikov'), the kernel used for the
-#' estimation: -> MEAN
+#' estimation:
 #'  \itemize{
 #'   \item epanechnikov
 #'   \item uniform

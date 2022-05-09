@@ -9,7 +9,7 @@ covariance_ll(
   grid = seq(0, 1, length.out = 101),
   grid_param = seq(0.1, 0.9, by = 0.1),
   grid_bandwidth = NULL,
-  centered = FALSE,
+  center = TRUE,
   delta_f = NULL,
   n_obs_min = 2,
   kernel_name = "epanechnikov"
@@ -29,29 +29,29 @@ at which estimate the curves.}
 \item{grid_param}{Vector (default = seq(0.1, 0.9, by = 0.1)), the sampling
 points at which we estimate the parameters.}
 
-\item{grid_bandwidth}{Vector (default = NULL), grid of bandwidths. -> MEAN}
+\item{grid_bandwidth}{Vector (default = NULL), grid of bandwidths.}
 
-\item{delta_f}{Function (default = NULL), function to determine the delta. -> MEAN}
+\item{center}{Boolean (default = TRUE), center the data?}
+
+\item{delta_f}{Function (default = NULL), function to determine the delta.}
 
 \item{n_obs_min}{Integer (default = 2), minimum number of observation for the
-smoothing. -> MEAN}
+smoothing.}
 
 \item{kernel_name}{String (default = 'epanechnikov'), the kernel used for the
-estimation: -> MEAN
+estimation:
 \itemize{
 \item epanechnikov
 \item uniform
 \item biweight
 }}
-
-\item{center}{Boolean (default = TRUE), center the data?}
 }
 \value{
 List of with three entries:
 \itemize{
-\item \strong{$parameter} The estimated parameters.
-\item \strong{$bandwidth} The estimated bandwidths.
-\item \strong{$cov} The estimated covariance.
+\item \strong{$parameters} Estimated parameters.
+\item \strong{$bandwidths_mat} Estimated bandwidths matrix.
+\item \strong{$covariance} Estimated covariance.
 }
 }
 \description{

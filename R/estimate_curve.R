@@ -7,6 +7,8 @@
 #' This function performs the smoothing of a curve using the Nadaraya-Watson 
 #' estimator given a particular kernel.
 #' 
+#' @importFrom Rcpp evalCpp
+#' 
 #' @param curve List, with two entries:
 #'  \itemize{
 #'   \item \strong{$t} Sampling points.

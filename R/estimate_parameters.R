@@ -312,8 +312,6 @@ estimate_parameters_recursion <- function(
 #' @param beta Numeric (default = 1), pre-specified regularity of the curves to
 #' start the recursion. The default value is 1, which correspond to at least one
 #' time differentiable curves.
-#' @param compute_crossvar Boolean (default = FALSE), should
-#' \eqn{Var(X_{s}X_{t)}} be computed for covariance estimation?
 #'
 #' @return Dataframe, with columns:
 #'  \itemize{
@@ -368,8 +366,6 @@ estimate_parameters_mean <- function(
 #' @param beta Numeric (default = 1), pre-specified regularity of the curves to
 #' start the recursion. The default value is 1, which correspond to at least one
 #' time differentiable curves.
-#' @param compute_crossvar Boolean (default = FALSE), should
-#' \eqn{Var(X_{s}X_{t)}} be computed for covariance estimation?
 #'
 #' @return Dataframe, with columns:
 #'  \itemize{

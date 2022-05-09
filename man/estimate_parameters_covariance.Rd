@@ -37,9 +37,6 @@ estimation:
 \item{beta}{Numeric (default = 1), pre-specified regularity of the curves to
 start the recursion. The default value is 1, which correspond to at least one
 time differentiable curves.}
-
-\item{compute_crossvar}{Boolean (default = FALSE), should
-\eqn{Var(X_{s}X_{t)}} be computed for covariance estimation?}
 }
 \value{
 Dataframe, with columns:
