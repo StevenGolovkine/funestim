@@ -5,52 +5,47 @@
 \title{Perform an estimation of the bandwidth for the estimation of the covariance.}
 \usage{
 estimate_bandwidth_covariance(
-  data,
-  s0,
-  t0,
-  H0 = c(0.5, 0.5),
-  L0 = c(1, 1),
-  moment2 = c(1, 1),
+  curves,
+  params,
   sigma = 0,
-  variance = 0,
-  grid = NULL,
-  nb_obs_minimal = 2,
-  type_k = 2
+  grid_bandwidth = lseq(0.001, 0.1, length.out = 101),
+  n_obs_min = 2,
+  kernel_name = "epanechnikov"
 )
 }
 \arguments{
+\item{params}{List, estimation of the different parameters for the data
+points pair to estimate:
+\itemize{
+\item \strong{$point} Time point where the smoothing has been done.
+\item \strong{$H} Estimated regularity.
+\item \strong{$L} Estimated constant.
+\item \strong{$var} Estimated variance.
+\item \strong{$mom} Estimated \eqn{E(X^{2}_{t_0})}.
+\item \strong{$var_st} Estimated \eqn{E(X^{2}_{t_0})}.
+}}
+
+\item{sigma}{Numeric, estimation of the std of the noise \eqn{\sigma}.}
+
+\item{grid_bandwidth}{Vector (default = lseq(0.001, 0.1, length.out = 101)),
+grid of bandwidths.}
+
+\item{n_obs_min}{Integer (default = 2), minimum number of points in the
+neighborhood to keep the curve in the estimation.}
+
+\item{kernel_name}{String (default = 'epanechnikov'), the kernel used for the
+estimation:
+\itemize{
+\item epanechnikov
+\item uniform
+\item biweight
+}}
+
 \item{data}{A list, where each element represents a curve. Each curve have to
 be defined as a list with two entries:
 \itemize{
 \item \strong{$t} The sampling points
 \item \strong{$x} The observed points.
-}}
-
-\item{s0}{Numeric, the sampling point at which we estimate the bandwidth.}
-
-\item{t0}{Numeric, the sampling point at which we estimate the bandwidth.}
-
-\item{H0}{Vector, an estimation of \eqn{H_0} at \eqn{s_0} and \eqn{t_0}.}
-
-\item{L0}{Vector, an estimation of \eqn{L_0} at \eqn{s_0} and \eqn{t_0}.}
-
-\item{moment2}{Vector, an estimation of \eqn{EX^2} at \eqn{s_0} and \eqn{t_0}.}
-
-\item{sigma}{Numeric, an estimation of \eqn{\sigma}.}
-
-\item{variance}{Numeric, an estimation of \eqn{Var(X_{s_0}X_{t_0)}}.}
-
-\item{grid}{Vector, default=lseq(0.001, 0.1, length.out = 101). A grid of
-bandwidths.}
-
-\item{nb_obs_minimal}{Integer, default=2. Minimum number of points in the
-neighborhood to keep the curve in the estimation.}
-
-\item{type_k}{Integer, default=2. Used kernel.
-\itemize{
-\item \strong{1} Uniform kernel
-\item \strong{2} Epanechnikov kernel
-\item \strong{3} Biweight kernel
 }}
 }
 \value{

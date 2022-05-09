@@ -244,7 +244,7 @@ lseq <- function(from = 1, to = 100, length.out = 51) {
 #'  
 #' @return Vector, the evaluated kernel.
 #' @export
-kernel <- function(u, type = 'epanechnikov'){
+kernel_f <- function(u, type = 'epanechnikov'){
   indicator <- function(u) 2 * stats::dunif(u, -1, 1)
   switch(type,
          uniform = {indicator(u) / 2},

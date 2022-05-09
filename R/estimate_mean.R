@@ -9,7 +9,7 @@
 #' methodology from Golovkine et al. (2021).
 #' 
 #' @param curves List, where each element represents a curve. Each curve have to
-#'  be defined as a list with two entries:
+#' be defined as a list with two entries:
 #'  \itemize{
 #'   \item \strong{$t} Sampling points
 #'   \item \strong{$x} Observed points.
@@ -37,7 +37,7 @@
 #'  }
 #' 
 #' @references Golovkine S., Klutchnikoff N., Patilea V. (2021) - Adaptive
-#'  estimation of irregular mean and covariance functions.
+#' estimation of irregular mean and covariance functions.
 #' @export
 mean_ll <- function(
     curves,
@@ -63,7 +63,7 @@ mean_ll <- function(
 #' smoothing splines.
 #' 
 #' @param curves List, where each element represents a curve. Each curve have to
-#'  be defined as a list with two entries:
+#' be defined as a list with two entries:
 #'  \itemize{
 #'   \item \strong{$t} Sampling points
 #'   \item \strong{$x} Observed points.
@@ -90,10 +90,10 @@ mean_ss <- function(curves, grid){
 #' methodology from Zhang et Wang (2016).
 #' 
 #' @param curves List, where each element represents a curve. Each curve have to
-#'  be defined as a list with two entries:
+#' be defined as a list with two entries:
 #'  \itemize{
-#'   \item \strong{$t} The sampling points
-#'   \item \strong{$x} The observed points.
+#'   \item \strong{$t} Sampling points
+#'   \item \strong{$x} Observed points.
 #'  } 
 #' @param grid Vector, sampling points at which estimate the mean.
 #' 

@@ -232,7 +232,7 @@ estimate_crossvar <- function(curves_smooth_s, curves_smooth_t) {
 #' @param point Numeric (default = 0.5), sampling point at which the data is 
 #' pre-smoothed.
 #' @param delta_f Function (default = NULL), function to determine the delta.
-#' @param kernel String (default = 'epanechnikov'), the kernel used for the 
+#' @param kernel_name String (default = 'epanechnikov'), the kernel used for the 
 #' estimation:
 #'  \itemize{
 #'   \item epanechnikov
@@ -243,48 +243,55 @@ estimate_crossvar <- function(curves_smooth_s, curves_smooth_t) {
 #' start the recursion. The default value is 1, which correspond to at least one
 #'time differentiable curves.
 #'
-#' @return List, with four entries:
+#' @return List, with six entries:
 #'  \itemize{
 #'   \item \strong{$point} Time point where the smoothing has been done.
+#'   \item \strong{$curves} Smoothed curves
 #'   \item \strong{$H} Estimated regularity.
 #'   \item \strong{$L} Estimated constant.
 #'   \item \strong{$var} Estimated variance.
+#'   \item \strong{$mom} Estimated \eqn{E(X^{2}_{t_0})}
 #'  }
 #' 
 #' @references S. Golovkine, N. Klutchnikoff and V. Patilea (2021) - Adaptive 
 #'  optimal estimation of irregular mean and covariance functions.
 #' @export
 estimate_parameters_recursion <- function(
-    curves, point = 0.5, delta_f = NULL, kernel = 'epanechnikov', beta = 1){
+    curves, point = 0.5, 
+    delta_f = NULL, kernel_name = 'epanechnikov', beta = 1) {
   n_loop <- 0
   H_estim <- 0
   H_prev <- beta
   while (abs(H_prev - H_estim) > 0.1) {
     H_prev <- beta - 0.1 * n_loop
     curves_smooth <- presmoothing(
-      curves, point, delta_f, kernel = kernel, beta = H_prev)
+      curves, point, delta_f, kernel = kernel_name, beta = H_prev)
     H_estim <- estimate_regularity(curves_smooth)
     n_loop <- n_loop + 1
   }
   L_estim <- estimate_constant(curves_smooth, H_estim)
   var_estim <- estimate_var(curves_smooth)
+  mom_estim <- estimate_moment(curves_smooth, 2)
   
   list(
     'point' = point,
+    'curves' = curves_smooth,
     'H' = H_estim,
     'L' = L_estim,
-    'var' = var_estim
+    'var' = var_estim,
+    'mom' = mom_estim
   )
 }
 
-#' Perform a recursive estimation of the parameters over a grid of points.
+#' Perform a recursive estimation of the parameters over a grid of points for
+#' the estimation of the mean.
 #' 
 #' This function performs a recursive estimation of the different parameters
-#' used for the estimation of the mean and covariance estimation of functional
-#' data. The recursion is made by small step onto the estimation of the
-#' regularity of the curves. The pre-smoothing of the data is done using a
-#' Nadaraya-Watson estimator and the used bandwidth modified using each new 
-#' estimation of the regularity.
+#' used for the estimation of the mean estimation of functional data. The
+#' recursion is made by small step onto the estimation of the regularity of the
+#' curves. The pre-smoothing of the data is done using a Nadaraya-Watson
+#' estimator and the used bandwidth modified using each new estimation of the
+#' regularity.
 #' 
 #' @param curves List, where each element represents a curve. Each curve have to
 #'  be defined as a list with two entries:
@@ -295,7 +302,7 @@ estimate_parameters_recursion <- function(
 #' @param grid Vector (default = c(0.25, 0.5, 0.75)), sampling points at which
 #' the data is pre-smoothed.
 #' @param delta_f Function (default = NULL), function to determine the delta.
-#' @param kernel String (default = 'epanechnikov'), the kernel used for the 
+#' @param kernel_name String (default = 'epanechnikov'), the kernel used for the 
 #' estimation:
 #'  \itemize{
 #'   \item epanechnikov
@@ -305,24 +312,97 @@ estimate_parameters_recursion <- function(
 #' @param beta Numeric (default = 1), pre-specified regularity of the curves to
 #' start the recursion. The default value is 1, which correspond to at least one
 #' time differentiable curves.
+#' @param compute_crossvar Boolean (default = FALSE), should
+#' \eqn{Var(X_{s}X_{t)}} be computed for covariance estimation?
 #'
-#' @return List, with four entries:
+#' @return Dataframe, with columns:
 #'  \itemize{
 #'   \item \strong{$point} Time point where the smoothing has been done.
+#'   \item \strong{$curves} Smoothed curves.
 #'   \item \strong{$H} Estimated regularity.
 #'   \item \strong{$L} Estimated constant.
 #'   \item \strong{$var} Estimated variance.
+#'   \item \strong{$mom} Estimated \eqn{E(X^{2}_{t_0})}
 #'  }
 #' 
 #' @references S. Golovkine, N. Klutchnikoff and V. Patilea (2021) - Adaptive 
 #'  optimal estimation of irregular mean and covariance functions.
 #' @export
-estimate_parameters <- function(
+estimate_parameters_mean <- function(
     curves, grid = c(0.25, 0.5, 0.75), delta_f = NULL, 
-    kernel = 'epanechnikov', beta = 1){
+    kernel_name = 'epanechnikov', beta = 1){
   lapply(1:length(grid), function(idx){
     estimate_parameters_recursion(
       curves, point = grid[idx], delta_f = delta_f,
-      kernel = kernel, beta = beta)
-  })
+      kernel_name = kernel_name, beta = beta)
+  }) |> 
+    (\(x) do.call("rbind", x))() |> 
+    as.data.frame()
 }
+
+#' Perform a recursive estimation of the parameters over a grid of points for
+#' the estimation of the covariance.
+#' 
+#' This function performs a recursive estimation of the different parameters
+#' used for the estimation of the covariance estimation of functional data. The
+#' recursion is made by small step onto the estimation of the regularity of the #' curves. The pre-smoothing of the data is done using a Nadaraya-Watson
+#' estimator and the used bandwidth modified using each new estimation of the
+#' regularity.
+#' 
+#' @param curves List, where each element represents a curve. Each curve have to
+#'  be defined as a list with two entries:
+#'  \itemize{
+#'   \item \strong{$t} The sampling points
+#'   \item \strong{$x} The observed points
+#'  } 
+#' @param grid Vector (default = c(0.25, 0.5, 0.75)), sampling points at which
+#' the data is pre-smoothed.
+#' @param delta_f Function (default = NULL), function to determine the delta.
+#' @param kernel_name String (default = 'epanechnikov'), the kernel used for the 
+#' estimation:
+#'  \itemize{
+#'   \item epanechnikov
+#'   \item uniform
+#'   \item biweight
+#'  }
+#' @param beta Numeric (default = 1), pre-specified regularity of the curves to
+#' start the recursion. The default value is 1, which correspond to at least one
+#' time differentiable curves.
+#' @param compute_crossvar Boolean (default = FALSE), should
+#' \eqn{Var(X_{s}X_{t)}} be computed for covariance estimation?
+#'
+#' @return Dataframe, with columns:
+#'  \itemize{
+#'   \item \strong{$point} Time point where the smoothing has been done.
+#'   \item \strong{$curves} Smoothed curves.
+#'   \item \strong{$H} Estimated regularity.
+#'   \item \strong{$L} Estimated constant.
+#'   \item \strong{$var} Estimated variance.
+#'   \item \strong{$mom} Estimated \eqn{E(X^{2}_{t_0})}
+#'   \item \strong{$var_st} \eqn{Var(X_{s}X_{t)}}
+#'  }
+#' 
+#' @references S. Golovkine, N. Klutchnikoff and V. Patilea (2021) - Adaptive 
+#'  optimal estimation of irregular mean and covariance functions.
+#' @export
+estimate_parameters_covariance <- function(
+    curves, grid = c(0.25, 0.5, 0.75), delta_f = NULL, 
+    kernel_name = 'epanechnikov', beta = 1){
+  params_estim <- estimate_parameters_mean(
+    curves, grid = grid, delta_f = delta_f, 
+    kernel_name = kernel_name, beta = beta)
+  zz <- expand.grid(point_s = grid, point_t = grid) |> 
+    merge(params_estim, 
+          by.x = "point_s", by.y = "point", all.x = TRUE, 
+          suffixes = c("", "_s"), sort = FALSE) |> 
+    merge(params_estim, 
+          by.x = "point_t", by.y = "point", all.x = TRUE, 
+          suffixes = c("_s", "_t"), sort = FALSE)
+  zz_upper <- zz[zz$point_t <= zz$point_s, ]
+  zz_upper$var_st <- zz_upper |> apply(1, function(rows) {
+    estimate_crossvar(rows$curves_s, rows$curves_t)
+  })
+  zz_upper[order(unlist(zz_upper$point_s), unlist(zz_upper$point_t)), ]
+}
+
+

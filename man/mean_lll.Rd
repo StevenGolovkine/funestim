@@ -10,8 +10,8 @@ mean_lll(curves, grid)
 \item{curves}{List, where each element represents a curve. Each curve have to
 be defined as a list with two entries:
 \itemize{
-\item \strong{$t} The sampling points
-\item \strong{$x} The observed points.
+\item \strong{$t} Sampling points
+\item \strong{$x} Observed points.
 }}
 
 \item{grid}{Vector, sampling points at which estimate the mean.}

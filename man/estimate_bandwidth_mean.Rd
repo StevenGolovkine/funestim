@@ -46,7 +46,7 @@ estimation:
 }}
 }
 \value{
-Numeric, estimation of the bandwidth.
+List, estimation of the bandwidth.
 }
 \description{
 This function performs an estimation of the bandwidth for a univariate kernel
