@@ -62,7 +62,7 @@ methodology from Golovkine et al. (2021).</p>
   grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">101</span><span class="op">)</span>,
   grid_param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.9</span>, by <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>,
   grid_bandwidth <span class="op">=</span> <span class="cn">NULL</span>,
-  centered <span class="op">=</span> <span class="cn">FALSE</span>,
+  center <span class="op">=</span> <span class="cn">TRUE</span>,
   delta_f <span class="op">=</span> <span class="cn">NULL</span>,
   n_obs_min <span class="op">=</span> <span class="fl">2</span>,
   kernel_name <span class="op">=</span> <span class="st">"epanechnikov"</span>
@@ -83,26 +83,26 @@ at which estimate the curves.</p></dd>
 <dd><p>Vector (default = seq(0.1, 0.9, by = 0.1)), the sampling
 points at which we estimate the parameters.</p></dd>
 <dt>grid_bandwidth</dt>
-<dd><p>Vector (default = NULL), grid of bandwidths. -&gt; MEAN</p></dd>
+<dd><p>Vector (default = NULL), grid of bandwidths.</p></dd>
+<dt>center</dt>
+<dd><p>Boolean (default = TRUE), center the data?</p></dd>
 <dt>delta_f</dt>
-<dd><p>Function (default = NULL), function to determine the delta. -&gt; MEAN</p></dd>
+<dd><p>Function (default = NULL), function to determine the delta.</p></dd>
 <dt>n_obs_min</dt>
 <dd><p>Integer (default = 2), minimum number of observation for the
-smoothing. -&gt; MEAN</p></dd>
+smoothing.</p></dd>
 <dt>kernel_name</dt>
 <dd><p>String (default = 'epanechnikov'), the kernel used for the
-estimation: -&gt; MEAN</p><ul><li><p>epanechnikov</p></li>
+estimation:</p><ul><li><p>epanechnikov</p></li>
 <li><p>uniform</p></li>
 <li><p>biweight</p></li>
 </ul></dd>
-<dt>center</dt>
-<dd><p>Boolean (default = TRUE), center the data?</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>List of with three entries:</p><ul><li><p><strong>$parameter</strong> The estimated parameters.</p></li>
-<li><p><strong>$bandwidth</strong> The estimated bandwidths.</p></li>
-<li><p><strong>$cov</strong> The estimated covariance.</p></li>
+    <p>List of with three entries:</p><ul><li><p><strong>$parameters</strong> Estimated parameters.</p></li>
+<li><p><strong>$bandwidths_mat</strong> Estimated bandwidths matrix.</p></li>
+<li><p><strong>$covariance</strong> Estimated covariance.</p></li>
 </ul></div>
     <div id="references">
     <h2>References</h2>

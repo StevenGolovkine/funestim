@@ -67,7 +67,12 @@ regression estimator defined over continuous data.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>params</dt>
+    <dl><dt>curves</dt>
+<dd><p>List, where each element represents a curve. Each curve have to
+be defined as a list with two entries:</p><ul><li><p><strong>$t</strong> The sampling points</p></li>
+<li><p><strong>$x</strong> The observed points.</p></li>
+</ul></dd>
+<dt>params</dt>
 <dd><p>List, estimation of the different parameters for the data
 points pair to estimate:</p><ul><li><p><strong>$point</strong> Time point where the smoothing has been done.</p></li>
 <li><p><strong>$H</strong> Estimated regularity.</p></li>
@@ -89,11 +94,6 @@ neighborhood to keep the curve in the estimation.</p></dd>
 estimation:</p><ul><li><p>epanechnikov</p></li>
 <li><p>uniform</p></li>
 <li><p>biweight</p></li>
-</ul></dd>
-<dt>data</dt>
-<dd><p>A list, where each element represents a curve. Each curve have to
-be defined as a list with two entries:</p><ul><li><p><strong>$t</strong> The sampling points</p></li>
-<li><p><strong>$x</strong> The observed points.</p></li>
 </ul></dd>
 </dl></div>
     <div id="value">
