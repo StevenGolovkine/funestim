@@ -9,7 +9,8 @@ estimate_bandwidths(
   t0_list = 0.5,
   grid = NULL,
   nb_obs_minimal = 2,
-  type_k = 2
+  type_k = 2,
+  H_true = NULL
 )
 }
 \arguments{

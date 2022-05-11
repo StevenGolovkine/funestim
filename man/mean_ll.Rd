@@ -10,7 +10,8 @@ mean_ll(
   t0_list = 0.5,
   grid = NULL,
   nb_obs_minimal = 2,
-  kernel = "epanechnikov"
+  kernel = "epanechnikov",
+  H_true = NULL
 )
 }
 \arguments{

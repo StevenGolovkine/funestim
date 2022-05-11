@@ -38,10 +38,12 @@
 #'  estimation of irregular mean and covariance functions.
 #' @export
 mean_ll <- function(data, U = seq(0, 1, length.out = 101), t0_list = 0.5, 
-                    grid = NULL, nb_obs_minimal = 2, kernel = 'epanechnikov'){
-  if(!inherits(data, 'list')) data <- checkData(data)
+                    grid = NULL, nb_obs_minimal = 2, kernel = 'epanechnikov',
+                    H_true = NULL){
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_smooth <- smooth_curves(data, U = U, t0_list = t0_list, grid = grid,
-                               nb_obs_minimal = nb_obs_minimal, kernel = kernel)
+                               nb_obs_minimal = nb_obs_minimal, kernel = kernel,
+                               H_true = H_true)
   mu <- data_smooth$smooth %>% 
     purrr::map_dfc(~ .x$x) %>% 
     rowMeans(na.rm = TRUE)
@@ -68,7 +70,7 @@ mean_ll <- function(data, U = seq(0, 1, length.out = 101), t0_list = 0.5,
 #' Statistics
 #' @export
 mean_ss <- function(data, U){
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_ <- list2cai(data)
   mod <- stats::smooth.spline(data_$time, data_$x)
   stats::predict(mod, U)$y
@@ -94,7 +96,7 @@ mean_ss <- function(data, U){
 #'  data and beyond, The Annals of Statistics
 #' @export
 mean_lll <- function(data, U) {
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_ <- list2cai(data)
   L3 <- fdapace::MakeFPCAInputs(IDs = data_$obs,
                                 tVec = data_$time,

@@ -111,13 +111,14 @@ estimate_curve <- function(curve, U, b, t0_list = NULL,
 #'  estimation of irregular mean and covariance functions.
 #' @export
 smooth_curves <- function(data, U = NULL, t0_list = 0.5, grid = NULL, 
-                          nb_obs_minimal = 2, kernel = 'epanechnikov'){
+                          nb_obs_minimal = 2, kernel = 'epanechnikov',
+                          H_true = NULL){
   
-  if(kernel == 'uniform')
+  if (kernel == 'uniform')
     type_k = 1
   else if (kernel == 'epanechnikov')
     type_k = 2
-  else if(kernel == 'biweight')
+  else if (kernel == 'biweight')
     type_k = 3
   else
     type_k = 1
@@ -125,7 +126,7 @@ smooth_curves <- function(data, U = NULL, t0_list = 0.5, grid = NULL,
   # Estimation of the different parameters
   param_estim <- estimate_bandwidths(data, t0_list = t0_list, grid = grid,
                                      nb_obs_minimal = nb_obs_minimal,
-                                     type_k = type_k)
+                                     type_k = type_k, H_true = H_true)
 
   # Estimation of the curves
   if (is.null(U)) {

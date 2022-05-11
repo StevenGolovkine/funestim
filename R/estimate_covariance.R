@@ -34,7 +34,7 @@
 #' @export
 covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
                           t0_list = seq(0.1, 0.9, by = 0.1),
-                          centered = FALSE){
+                          centered = FALSE, H_true = NULL){
   # Inner function to compute the covariance on a particular point (s, t)
   gamma_st <- function(data, s0, t0, b, n_obs_min = 2){
     data %>%
@@ -43,19 +43,24 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
       mean(na.rm = TRUE)
   }
   
-  if(!centered){
+  if (!centered) {
     mean_global <- mean(purrr::map_dbl(data, ~ mean(.x$x)))
     data <- data %>% purrr::map(~ list(t = .x$t, x = .x$x - mean_global))
   }
   
-  if(!inherits(data, 'list')) data <- checkData(data)
-  mu_estim <- mean_ll(data, U = U, t0_list = t0_list)
+  if (!inherits(data, 'list')) data <- checkData(data)
+  mu_estim <- mean_ll(data, U = U, t0_list = t0_list, H_true = H_true)
   
   # Estimation of the parameters
   Mi <- data %>% purrr::map_dbl(~ length(.x$t))
   data_presmooth <- presmoothing(data, t0_list, gamma = 0.5)
   sigma_estim <- max(estimate_sigma(data, t0_list, k0_list = 2))
-  H0_estim <- estimate_H0(data_presmooth)
+  
+  if (is.null(H_true)) {
+    H0_estim <- estimate_H0(data_presmooth)
+  } else {
+    H0_estim <- H_true
+  }
   L0_estim <- estimate_L0(data_presmooth, H0_estim, mean(Mi))
   mom2 <- estimate_moment(data_presmooth, 2)
   var_st <- variance(data_presmooth)

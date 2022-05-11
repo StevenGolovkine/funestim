@@ -52,12 +52,12 @@ estimate_bandwidth <- function(data, t0, H0 = 0.5, L0 = 1, sigma = 0,
   q3 <- sqrt(variance)
   
   risk <- rep(NA, length(grid))
-  for(b in 1:length(grid)){
+  for (b in 1:length(grid)) {
     current_b <- grid[b]
     
     wi <- data %>% purrr::map_dbl(~ neighbors(.x$t, t0, current_b, nb_obs_minimal))
     WN <- sum(wi)
-    if(WN == 0) next
+    if (WN == 0) next
     
     temp <- data %>% purrr::map(~ kernel((.x$t - t0) / current_b, type_k))
     Wi <- temp %>% purrr::map(~ .x / sum(.x))
@@ -110,18 +110,24 @@ estimate_bandwidth <- function(data, t0, H0 = 0.5, L0 = 1, sigma = 0,
 #'  estimation of irregular mean and covariance functions.
 #' @export
 estimate_bandwidths <- function(data, t0_list = 0.5, grid = NULL,
-                                nb_obs_minimal = 2, type_k = 2) {
-  if(!inherits(data, 'list')) data <- checkData(data)
+                                nb_obs_minimal = 2, type_k = 2,
+                                H_true = NULL) {
+  if (!inherits(data, 'list')) data <- checkData(data)
   
   # Estimation of the parameters
   M <- data %>% purrr::map_dbl(~ length(.x$t)) %>% mean()
   data_presmooth <- presmoothing(data, t0_list, gamma = 0.5)
   sigma_estim <- estimate_sigma(data, t0_list, k0_list = 2)
   variance_estim <- estimate_var(data_presmooth)
-  H0_estim <- estimate_H0(data_presmooth)
-  L0_estim <- estimate_L0(data_presmooth, H0_estim, M)
   
-  if(is.null(grid)){
+  if (is.null(H_true)) {
+    H0_estim <- estimate_H0(data_presmooth)
+  } else {
+    H0_estim <- H_true
+  }
+  L0_estim <- estimate_L0(data_presmooth, H0_estim, M)  
+  
+  if (is.null(grid)) {
     N <- length(data)
     Mi <- data %>% purrr::map_dbl(~ length(.x$t))
     aa <- log(1/(N*max(Mi))) / min(2 * H0_estim + 1) - log(1)
@@ -194,8 +200,8 @@ estimate_bandwidth_covariance <- function(data, s0, t0,
                                           grid = NULL,
                                           nb_obs_minimal = 2, 
                                           type_k = 2) {
-  if(!inherits(data, 'list')) data <- checkData(data)
-  if(is.null(grid)) grid <- lseq(0.01, 0.1, length.out = 41)
+  if (!inherits(data, 'list')) data <- checkData(data)
+  if (is.null(grid)) grid <- lseq(0.01, 0.1, length.out = 41)
   
   # Constant definition
   cst_k <- switch(type_k,
@@ -209,14 +215,14 @@ estimate_bandwidth_covariance <- function(data, s0, t0,
   q3 <- sqrt(variance)
   
   risk <- rep(NA, length(grid))
-  for(b in 1:length(grid)){
+  for (b in 1:length(grid)) {
     current_b <- grid[b]
     
     wis <- data %>% purrr::map_dbl(~ neighbors(.x$t, s0, current_b, nb_obs_minimal))
     wit <- data %>% purrr::map_dbl(~ neighbors(.x$t, t0, current_b, nb_obs_minimal))
     wi <- wis * wit
     WN <- sum(wi)
-    if(WN == 0) next
+    if (WN == 0) next
     
     temps <- data %>% purrr::map(~ kernel((.x$t - s0) / current_b, type_k))
     Wis <- temps %>% purrr::map(~ .x / sum(.x))
