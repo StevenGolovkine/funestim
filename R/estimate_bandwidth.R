@@ -218,8 +218,10 @@ estimate_bandwidth_covariance <- function(data, s0, t0,
   for (b in 1:length(grid)) {
     current_b <- grid[b]
     
-    wis <- data %>% purrr::map_dbl(~ neighbors(.x$t, s0, current_b, nb_obs_minimal))
-    wit <- data %>% purrr::map_dbl(~ neighbors(.x$t, t0, current_b, nb_obs_minimal))
+    wis <- data %>% purrr::map_dbl(
+      ~ neighbors(.x$t, s0, current_b, nb_obs_minimal))
+    wit <- data %>% purrr::map_dbl(
+      ~ neighbors(.x$t, t0, current_b, nb_obs_minimal))
     wi <- wis * wit
     WN <- sum(wi)
     if (WN == 0) next
