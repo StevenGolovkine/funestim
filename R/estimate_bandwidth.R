@@ -74,7 +74,8 @@ estimate_bandwidth_mean <- function(
     
     temp <- curves |> 
       lapply(function(curve) {
-        kernel_f((curve$t - params$point) / current_bandwidth, type = kernel_name)
+        kernel_f((curve$t - params$point) / current_bandwidth,
+                 type = kernel_name)
       })
     Wi <- temp |> 
       lapply(function(curve) {
@@ -264,7 +265,8 @@ estimate_bandwidth_covariance <- function(
     
     tempt <- curves |> 
       lapply(function(curve) {
-        kernel_f((curve$t - params$point_t) / current_bandwidth, type = kernel_name)
+        kernel_f((curve$t - params$point_t) / current_bandwidth,
+                 type = kernel_name)
       })
     Wit <- tempt |> lapply(function(curve) {
       curve / sum(curve)
