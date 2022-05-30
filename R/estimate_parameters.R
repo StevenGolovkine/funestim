@@ -92,7 +92,8 @@ presmoothing <- function(curves, point = 0.5, delta_f = NULL,
   t_vec <- c(point - delta / 2, point, point + delta / 2)
   
   if (bandwidth_naive == 0)
-    bandwidth_naive <- (delta / m)**(1 / (2 * beta + 1))
+    #bandwidth_naive <- (delta / m)**(1 / (2 * beta + 1))
+    bandwidth_naive <- log(m) / m
   
   list(
     grid = t_vec,
