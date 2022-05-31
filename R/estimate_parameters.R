@@ -91,7 +91,8 @@ presmoothing <- function(data, t0_list = 0.5, gamma = 0.5,
   t1_list <- t0_list - delta / 2
   t3_list <- t0_list + delta / 2
   
-  b_naive <- (delta / round(m))**(1 / (2 * order + 1))
+  #b_naive <- (delta / round(m))**(1 / (2 * order + 1))
+  b_naive <- log(m) / m
   
   results <- list()
   for(idx_t0 in 1:length(t0_list)){
