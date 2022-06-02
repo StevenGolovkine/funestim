@@ -57,13 +57,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // estimateSigma
-double estimateSigma(const List& curves);
-RcppExport SEXP _funestim_estimateSigma(SEXP curvesSEXP) {
+double estimateSigma(const List& curves, const double& delta);
+RcppExport SEXP _funestim_estimateSigma(SEXP curvesSEXP, SEXP deltaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const List& >::type curves(curvesSEXP);
-    rcpp_result_gen = Rcpp::wrap(estimateSigma(curves));
+    Rcpp::traits::input_parameter< const double& >::type delta(deltaSEXP);
+    rcpp_result_gen = Rcpp::wrap(estimateSigma(curves, delta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -72,7 +73,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_funestim_epaKernelSmoothingCurve", (DL_FUNC) &_funestim_epaKernelSmoothingCurve, 5},
     {"_funestim_uniKernelSmoothingCurve", (DL_FUNC) &_funestim_uniKernelSmoothingCurve, 5},
     {"_funestim_biweightKernelSmoothingCurve", (DL_FUNC) &_funestim_biweightKernelSmoothingCurve, 5},
-    {"_funestim_estimateSigma", (DL_FUNC) &_funestim_estimateSigma, 1},
+    {"_funestim_estimateSigma", (DL_FUNC) &_funestim_estimateSigma, 2},
     {NULL, NULL, 0}
 };
 

@@ -43,10 +43,11 @@ estimate_bandwidth <- function(data, t0, H0 = 0.5, L0 = 1, sigma = 0,
                                grid = lseq(0.001, 0.1, length.out = 101),
                                nb_obs_minimal = 2, type_k = 2) {
   # Define constants
-  cst_k <- switch(type_k,  
-                  1 / (1 + 2 * H0), 
-                  1.5 * (1 / (1 + 2 * H0) - 1 / (3 + 2 * H0)),
-                  1.875 * (1 / (1 + 2 * H0) - 2 / (3 + 2 * H0) + 1 / (5 + 2 * H0)))
+  cst_k <- switch(
+    type_k,  
+    1 / (1 + 2 * H0), 
+    1.5 * (1 / (1 + 2 * H0) - 1 / (3 + 2 * H0)),
+    1.875 * (1 / (1 + 2 * H0) - 2 / (3 + 2 * H0) + 1 / (5 + 2 * H0)))
   q1 <- L0 / factorial(floor(H0)) * sqrt(cst_k)
   q2 <- sigma
   q3 <- sqrt(variance)
@@ -55,7 +56,8 @@ estimate_bandwidth <- function(data, t0, H0 = 0.5, L0 = 1, sigma = 0,
   for (b in 1:length(grid)) {
     current_b <- grid[b]
     
-    wi <- data %>% purrr::map_dbl(~ neighbors(.x$t, t0, current_b, nb_obs_minimal))
+    wi <- data %>% purrr::map_dbl(
+      ~ neighbors(.x$t, t0, current_b, nb_obs_minimal))
     WN <- sum(wi)
     if (WN == 0) next
     
@@ -116,8 +118,8 @@ estimate_bandwidths <- function(data, t0_list = 0.5, grid = NULL,
   
   # Estimation of the parameters
   M <- data %>% purrr::map_dbl(~ length(.x$t)) %>% mean()
-  data_presmooth <- presmoothing(data, t0_list, gamma = 0.5)
-  sigma_estim <- estimate_sigma(data, t0_list, k0_list = 2)
+  data_presmooth <- presmoothing(data, t0_list)
+  sigma_estim <- estimate_sigma(data, delta = 0.2)
   variance_estim <- estimate_var(data_presmooth)
   
   if (is.null(H_true)) {

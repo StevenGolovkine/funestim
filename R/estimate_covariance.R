@@ -53,8 +53,8 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
   
   # Estimation of the parameters
   Mi <- data %>% purrr::map_dbl(~ length(.x$t))
-  data_presmooth <- presmoothing(data, t0_list, gamma = 0.5)
-  sigma_estim <- max(estimate_sigma(data, t0_list, k0_list = 2))
+  data_presmooth <- presmoothing(data, t0_list)
+  sigma_estim <- max(estimate_sigma(data, delta = 0.2))
   
   if (is.null(H_true)) {
     H0_estim <- estimate_H0(data_presmooth)

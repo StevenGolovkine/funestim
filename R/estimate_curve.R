@@ -53,11 +53,14 @@ estimate_curve <- function(curve, U, b, t0_list = NULL,
   }
   
   if (kernel == "epanechnikov") {
-    x_hat <- epaKernelSmoothingCurve(U, curve$t, curve$x, bandwidth, n_obs_min)
+    x_hat <- epaKernelSmoothingCurve(
+      U, curve$t, curve$x, bandwidth, n_obs_min)
   } else if (kernel == "uniform") {
-    x_hat <- uniKernelSmoothingCurve(U, curve$t, curve$x, bandwidth, n_obs_min)
+    x_hat <- uniKernelSmoothingCurve(
+      U, curve$t, curve$x, bandwidth, n_obs_min)
   } else if (kernel == "biweight") {
-    x_hat <- biweightKernelSmoothingCurve(U, curve$t, curve$x, bandwidth, n_obs_min)
+    x_hat <- biweightKernelSmoothingCurve(
+      U, curve$t, curve$x, bandwidth, n_obs_min)
   } else {
     print("Wrong kernel name")
     x_hat <- rep(0, length(U))
@@ -124,9 +127,11 @@ smooth_curves <- function(data, U = NULL, t0_list = 0.5, grid = NULL,
     type_k = 1
   
   # Estimation of the different parameters
-  param_estim <- estimate_bandwidths(data, t0_list = t0_list, grid = grid,
-                                     nb_obs_minimal = nb_obs_minimal,
-                                     type_k = type_k, H_true = H_true)
+  param_estim <- estimate_bandwidths(
+    data, t0_list = t0_list, grid = grid,
+    nb_obs_minimal = nb_obs_minimal,
+    type_k = type_k, H_true = H_true
+  )
 
   # Estimation of the curves
   if (is.null(U)) {

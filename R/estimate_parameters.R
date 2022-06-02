@@ -24,31 +24,14 @@
 #'   \item \strong{$t} The sampling points
 #'   \item \strong{$x} The observed points
 #'  }
-#' @param t0_list Vector, the sampling points at which we estimate \eqn{H_0}. We 
-#'  will consider the \eqn{8k0 - 7} nearest points of \eqn{t_0} for the 
-#'  estimation of \eqn{H_0} when \eqn{\sigma} is unknown.
-#' @param k0_list Vector, the number of neighbors of \eqn{t_0} to consider. 
-#' Should be set as \eqn{k0 = M\exp(-(\log(\log(M))**2))}. We can set a 
-#' different \eqn{k_0}, but in order to use the same for each \eqn{t_0}, just 
-#' put a unique numeric.
+#' @param delta Numeric (default = 0.1), neighborhood for the estimation.
 #'  
 #' @return A list, an estimation of sigma at different \eqn{t_0}.
 #' @references S. Golovkine, N. Klutchnikoff, V. Patilea (2020) - Learning the
 #'  smoothness of noisy curves with application to online curve estimation.
 #' @export
-estimate_sigma <- function(data, t0_list, k0_list){
-  if(!inherits(data, 'list')) data <- checkData(data)
-  t0_list %>% 
-    purrr::map2_dbl(k0_list, 
-      function(t0, k0) {
-        idxs <- data %>% 
-          purrr::map_dbl(~ min(order(abs(.x$t - t0))[seq_len(8 * k0 - 6)]))
-        df_sub <- data %>% 
-          purrr::map2(idxs, ~ list(t = .x$t[.y:(.y + 8 * k0 - 7)],
-                                   x = .x$x[.y:(.y + 8 * k0 - 7)]))
-        estimateSigma(df_sub)
-      }
-    )
+estimate_sigma <- function(data, delta = 0.1){
+  estimateSigma(data, delta = delta )
 }
 # ----
 
@@ -82,33 +65,44 @@ estimate_sigma <- function(data, t0_list, k0_list){
 #' @references S. Golovkine, N. Klutchnikoff and V. Patilea (2021) - Adaptive 
 #'  optimal estimation of irregular mean and covariance functions.
 #' @export
-presmoothing <- function(data, t0_list = 0.5, gamma = 0.5,
-                         order = 1, drv = 0){
-  if(!inherits(data, 'list')) data <- checkData(data)
+presmoothing <- function(
+    data,
+    t0_list = seq(.2, .8, l = 20)
+){
+  if (!inherits(data, 'list')) data <- checkData(data)
+  
+  NW <- function(t, T_mi, Y_mi, h, alpha = 1) {
+    K <- function(x, beta){
+      ((1 + beta) / (2 * beta))  * (1 - abs(x)^beta) * (abs(x) <= 1)
+    }
+    tt <- matrix(rep(t, length(T_mi)), ncol = length(T_mi))
+    TT <- t(matrix(rep(T_mi, length(t)), ncol = length(t)))
+    Kx <- 2 * K(x = (tt - TT) / h, beta = alpha)
+    (Kx %*% Y_mi) / matrix(rowSums(Kx))
+  }
   
   m <- data %>% purrr::map_dbl(~ length(.x$t)) %>% mean()
-  delta <- exp(-log(m)**gamma)
+  
+  delta <- min(log(m)^(-1.1), 0.2)
   t1_list <- t0_list - delta / 2
   t3_list <- t0_list + delta / 2
   
   #b_naive <- (delta / round(m))**(1 / (2 * order + 1))
   b_naive <- log(m) / m
   
-  results <- list()
-  for(idx_t0 in 1:length(t0_list)){
-    df <- array(dim = c(length(data), 11))
-    for(i in 1:length(data)){
-      # The bandwidth is divided by 3 because of the Gaussian kernel used in
-      # KernSmooth::locpoly
-      pred <- KernSmooth::locpoly(data[[i]]$t, data[[i]]$x,
-                                  bandwidth = b_naive / 3,
-                                  drv = drv, degree = 0, gridsize = 11,
-                                  range.x = c(t1_list[idx_t0], t3_list[idx_t0]))
-      df[i, ] <- pred$y
-    }
-    results[[idx_t0]] <- list(t = pred$x, x = df)
+  inner_loop <- function(i, data, t_list, b_naive, init_b) {
+    sapply(data, function(x) {
+      NW(t = t_list[, i],
+         T_mi = x$t, Y_mi = x$x,
+         h = b_naive, alpha = init_b)
+    }) %>% t() 
   }
-  return(results)
+  
+  t_list <- rbind(t1_list, t0_list, t3_list)
+  purrr::map(1:ncol(t_list), ~list(
+    t_list = t_list[,.x],
+    x = inner_loop(.x, data = data, t_list = t_list,
+                   b_naive = b_naive, init_b = 1)))
 }
 
 #' Perform an estimation of \eqn{Var(X_{t_0)}}.
@@ -127,7 +121,7 @@ presmoothing <- function(data, t0_list = 0.5, gamma = 0.5,
 #' optimal estimation of irregular mean and covariance functions.
 #' @export
 estimate_var <- function(data){
-  data %>% purrr::map_dbl(~ var(.x$x[,6], na.rm = TRUE))
+  data %>% purrr::map_dbl(~ var(.x$x[,2], na.rm = TRUE))
 }
 
 #' Perform an estimation of \eqn{H_0}.
@@ -147,9 +141,10 @@ estimate_var <- function(data){
 #' @export
 estimate_H0 <- function(data){
   data %>% purrr::map_dbl(function(d) {
-      a <- mean((d$x[, 6] - d$x[, 1])**2, na.rm = TRUE)
-      b <- mean((d$x[, 11] - d$x[, 1])**2, na.rm = TRUE)
-      min(max((log(b) - log(a)) / (2 * log(2)), 0.1), 1)
+      a <- mean((d$x[, 3] - d$x[, 1])**2, na.rm = TRUE)
+      b <- mean((d$x[, 2] - d$x[, 1])**2, na.rm = TRUE)
+      c <- mean((d$x[, 3] - d$x[, 2])**2, na.rm = TRUE)
+      max(min((2 * log(a) - log(b * c)) / log(16), 1), 0.1)
     }
   )
 }
@@ -174,9 +169,11 @@ estimate_H0 <- function(data){
 estimate_L0 <- function(data, H0_list, M) {
   H0 <- H0_list %>% purrr::map_dbl(~ .x - 1 / log(M)**1.01)
   V1 <- data %>% 
-    purrr::map2(H0, ~ (.x$x[, 6] - .x$x[, 1])**2 / abs(.x$t[6] - .x$t[1])**(2 * .y))
+    purrr::map2(H0, 
+                ~ (.x$x[, 2] - .x$x[, 1])**2 / abs(.x$t[2] - .x$t[1])**(2 * .y))
   V2 <- data %>% 
-    purrr::map2(H0, ~ (.x$x[, 11] - .x$x[, 6])**2 / abs(.x$t[11] - .x$t[6])**(2 * .y))
+    purrr::map2(H0, 
+                ~ (.x$x[, 3] - .x$x[, 2])**2 / abs(.x$t[3] - .x$t[2])**(2 * .y))
   V_mean <- V1 %>% purrr::map2_dfc(V2, ~ (.x + .y) / 2)
   unname(sqrt(colMeans(V_mean, na.rm = TRUE)))
 }
@@ -198,7 +195,7 @@ estimate_L0 <- function(data, H0_list, M) {
 #'  estimation of irregular mean and covariance functions.
 #' @export
 estimate_moment <- function(data, order = 1) {
-  data %>% purrr::map_dbl(~ mean(.x$x[, 6]**order, na.rm = TRUE))
+  data %>% purrr::map_dbl(~ mean(.x$x[, 2]**order, na.rm = TRUE))
 }
 
 #' Perform the estimation of \eqn{Var(X_{s}X_{t)}}.
@@ -220,7 +217,7 @@ variance <- function(data) {
   var_st <- matrix(NA, nrow = length(data), ncol = length(data))
   for(i in 1:length(data)){
     for(j in 1:length(data)){
-      var_st[i, j] <- stats::var(data[[i]]$x[, 6] * data[[j]]$x[,6], na.rm = TRUE)
+      var_st[i, j] <- stats::var(data[[i]]$x[, 2] * data[[j]]$x[, 2], na.rm = TRUE)
     }
   }
   as.vector(var_st)

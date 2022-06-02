@@ -38,8 +38,9 @@ We perform an estimation of the mean curve.
 
 ```{r estimate_mean, warning=FALSE, message=FALSE, cache=TRUE}
 obs_points <- seq(0, 1, length.out = 101)  # Estimation grid mean
-band_points <- seq(0.05, 0.95, length.out = 50) # Estimation grid regularity
-mean_curve <- mean_ll(X, U = obs_points, t0_list = band_points)
+band_points <- seq(0.2, 0.8, length.out = 20) # Estimation grid regularity
+mean_curve <- mean_ll(X, U = obs_points, t0_list = band_points,
+                      grid = NULL, nb_obs_minimal = 2, kernel = 'epanechnikov')
 ```
 
 ```{r plot_mean, echo=FALSE, fig.height=4.35, fig.width=7}
