@@ -113,7 +113,7 @@ estimate_bandwidth <- function(data, t0, H0 = 0.5, L0 = 1, sigma = 0,
 #' @export
 estimate_bandwidths <- function(data, t0_list = 0.5, grid = NULL,
                                 nb_obs_minimal = 2, type_k = 2,
-                                H_true = NULL) {
+                                H_true = NULL, fit_tree = TRUE) {
   if (!inherits(data, 'list')) data <- checkData(data)
   
   # Estimation of the parameters
@@ -124,10 +124,14 @@ estimate_bandwidths <- function(data, t0_list = 0.5, grid = NULL,
   
   if (is.null(H_true)) {
     H0_estim <- estimate_H0(data_presmooth)
+    if (fit_tree) {
+      tree <- rpart::rpart(H0_estim ~ t0_list)
+      H0_estim <- unname(predict(tree))
+    }
   } else {
     H0_estim <- H_true
   }
-  L0_estim <- estimate_L0(data_presmooth, H0_estim, M)  
+  L0_estim <- estimate_L0(data_presmooth, H0_estim, M)
   
   if (is.null(grid)) {
     N <- length(data)
