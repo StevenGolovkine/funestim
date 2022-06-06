@@ -4,7 +4,7 @@
 \alias{presmoothing}
 \title{Perform a pre-smoothing of the data.}
 \usage{
-presmoothing(data, t0_list = 0.5, gamma = 0.5, order = 1, drv = 0)
+presmoothing(data, t0_list = seq(0.2, 0.8, l = 20), init_b = 1, init_L = 1)
 }
 \arguments{
 \item{data}{A list, where each element represents a curve. Each curve have to

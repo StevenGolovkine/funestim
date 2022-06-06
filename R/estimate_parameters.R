@@ -31,7 +31,31 @@
 #'  smoothness of noisy curves with application to online curve estimation.
 #' @export
 estimate_sigma <- function(data, delta = 0.1){
-  estimateSigma(data, delta = delta )
+  estimateSigma(data, delta = delta)
+}
+# ----
+
+# Estimate the minimum of the density ----
+
+#' Perform an estimation of the minimum of the sampling points density.
+#' 
+#' This function performs an estimation of the minimum of the density of the
+#' noise.
+#' 
+#' @importFrom magrittr %>%
+#' 
+#' @param data A list, where each element represents a curve. Each curve have to
+#'  be defined as list with two entries:
+#'  \itemize{
+#'   \item \strong{$t} The sampling points
+#'   \item \strong{$x} The observed points
+#'  }
+#'  
+#' @return An estimation of the minimum of the density of the sampling points.
+#' @export
+estimate_density <- function(data){
+  T_all <- data %>% purrr::map(~.x$t) %>% unlist() %>% sort()
+  min(density(T_all, from = 0.1, to = 0.9)$y)
 }
 # ----
 
@@ -67,7 +91,9 @@ estimate_sigma <- function(data, delta = 0.1){
 #' @export
 presmoothing <- function(
     data,
-    t0_list = seq(.2, .8, l = 20)
+    t0_list = seq(.2, .8, l = 20),
+    init_b = 1,
+    init_L = 1
 ){
   if (!inherits(data, 'list')) data <- checkData(data)
   
@@ -87,8 +113,15 @@ presmoothing <- function(
   t1_list <- t0_list - delta / 2
   t3_list <- t0_list + delta / 2
   
+  sigma <- estimate_sigma(data)
+  mu0 <- estimate_density(data)
+  
   #b_naive <- (delta / round(m))**(1 / (2 * order + 1))
-  b_naive <- log(m) / m
+  #b_naive <- log(m) / m
+  aa <- (init_b + 1) / 2 * init_b**2 * mu0
+  c <- (sigma**(2*init_b) * init_L * aa**init_b)**(1 / (2*init_b + 1))
+  psi_m <- (1 / m)**(init_b / (2 * init_b + 1))
+  b_naive <- pmax(pmin((c * psi_m / init_L)**(1 / init_b), delta/4), log(m)/m)
   
   inner_loop <- function(i, data, t_list, b_naive, init_b) {
     sapply(data, function(x) {

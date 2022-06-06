@@ -31,7 +31,12 @@ mu <- learn_mean(powerconsumption)
 cov <- learn_covariance(powerconsumption)
 noise <- learn_noise(powerconsumption)
 
-X <- generate_data(100, 100, mu, cov, noise, exp(-5.5), 0.2, 1)
+X <- generate_data(n = 100, m = 100,
+                   model_mean = mu, covariance = cov,
+                   model_noise = noise, 
+                   lambda = exp(-5.5),
+                   grid = seq(0, 1, length.out = 101),
+                   p = 0.2, k = 1)
 ```
 
 We perform an estimation of the mean curve.
@@ -54,13 +59,13 @@ lines(obs_points, mean_curve$mu, col = 'red', lwd = 4)
 We perform an estimation of the covariance surface.
 
 ```{r estimate_cov, warning=FALSE, message=FALSE, cache=TRUE}
-obs_points <- seq(0, 1, length.out = 101)  # Estimation grid mean
-band_points <- seq(0.05, 0.95, length.out = 10) # Estimation grid regularity
-cov_our <- covariance_ll(X, U = obs_points, t0_list = band_points, 
-                         centered = FALSE)
+#obs_points <- seq(0, 1, length.out = 101)  # Estimation grid mean
+#band_points <- seq(0.05, 0.95, length.out = 10) # Estimation grid regularity
+#cov_our <- covariance_ll(X, U = obs_points, t0_list = band_points, 
+#                         centered = FALSE)
 ```
 
 ```{r plot_cov, echo=FALSE, fig.height=7, fig.width=7}
-filled.contour(cov_our$cov, nlevels = 5)
+#filled.contour(cov_our$cov, nlevels = 5)
 ```
 

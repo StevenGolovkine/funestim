@@ -8,7 +8,8 @@ covariance_ll(
   data,
   U = seq(0, 1, length.out = 101),
   t0_list = seq(0.1, 0.9, by = 0.1),
-  centered = FALSE
+  centered = FALSE,
+  H_true = NULL
 )
 }
 \arguments{
