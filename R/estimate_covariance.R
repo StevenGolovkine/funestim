@@ -42,6 +42,14 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
       purrr::map_dbl(~ prod(.x)) %>% 
       mean(na.rm = TRUE)
   }
+  # Inner function to compute the mu(s)mu(t) on a particular point (s, t)
+  mu_st <- function(data, s0, t0, b, n_obs_min = 2){
+    data %>%
+      purrr::map(~ estimate_curve(.x, c(s0, t0), b, n_obs_min = n_obs_min)$x) %>% 
+      do.call(rbind, .) %>%
+      colMeans(na.rm = TRUE) %>%
+      prod(na.rm = TRUE)
+  }
   
   if (!centered) {
     mean_global <- mean(purrr::map_dbl(data, ~ mean(.x$x)))
@@ -49,7 +57,7 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
   }
   
   if (!inherits(data, 'list')) data <- checkData(data)
-  mu_estim <- mean_ll(data, U = U, t0_list = t0_list, H_true = H_true)
+  #mu_estim <- mean_ll(data, U = U, t0_list = t0_list, H_true = H_true)
   
   # Estimation of the parameters
   Mi <- data %>% purrr::map_dbl(~ length(.x$t))
@@ -110,15 +118,18 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
   cov_df <- cov_df %>% 
     dplyr::mutate(is_upper = t <= s, b = as.vector(bb_large)) %>%
     dplyr::filter(is_upper) %>% 
-    dplyr::mutate(cov = purrr::pmap_dbl(list(s, t, b), gamma_st, 
-                                        data = data, n_obs_min = 2))
+    dplyr::mutate(gamma = purrr::pmap_dbl(list(s, t, b), gamma_st, 
+                                        data = data, n_obs_min = 2)) %>%
+    dplyr::mutate(mu = purrr::pmap_dbl(list(s, t, b), mu_st, 
+                                        data = data, n_obs_min = 2)) %>%
+    dplyr::mutate(cov = gamma - mu)
 
-  prod_mu <- mu_estim$mu %*% t(mu_estim$mu)
-  prod_mu <- prod_mu[upper.tri(prod_mu, diag = TRUE)]
+  #prod_mu <- mu_estim$mu %*% t(mu_estim$mu)
+  #prod_mu <- prod_mu[upper.tri(prod_mu, diag = TRUE)]
   
   # Create the final covariance
   res <- matrix(0, nrow = length(U), ncol = length(U))
-  res[upper.tri(res, diag = TRUE)] <- cov_df$cov - prod_mu
+  res[upper.tri(res, diag = TRUE)] <- cov_df$cov
   for(t in 1:ncol(res)){
     s <- 1
     current_cov <- res[s, t - s + 1]
