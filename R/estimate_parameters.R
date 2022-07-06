@@ -248,8 +248,8 @@ estimate_moment <- function(data, order = 1) {
 #' @export
 variance <- function(data) {
   var_st <- matrix(NA, nrow = length(data), ncol = length(data))
-  for(i in 1:length(data)){
-    for(j in 1:length(data)){
+  for (i in 1:length(data)) {
+    for (j in 1:length(data)) {
       var_st[i, j] <- stats::var(data[[i]]$x[, 2] * data[[j]]$x[, 2], na.rm = TRUE)
     }
   }

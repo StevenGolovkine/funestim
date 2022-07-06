@@ -39,12 +39,12 @@
 #' @export
 mean_ll <- function(data, U = seq(0, 1, length.out = 101), t0_list = 0.5, 
                     grid = NULL, nb_obs_minimal = 2, kernel = 'epanechnikov',
-                    H_true = NULL){
+                    H_true = NULL, fit_tree = TRUE){
   if (!inherits(data, 'list')) data <- checkData(data)
   data_smooth <- smooth_curves(
     data, U = U, t0_list = t0_list, grid = grid,
     nb_obs_minimal = nb_obs_minimal, kernel = kernel,
-    H_true = H_true
+    H_true = H_true, fit_tree = fit_tree
   )
   mu <- data_smooth$smooth %>% 
     purrr::map_dfc(~ .x$x) %>% 
