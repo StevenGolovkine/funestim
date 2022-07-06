@@ -20,6 +20,7 @@
 #' @param U Vector, sampling points at which estimate the curves.
 #' @param t0_list Vector, the sampling points at which we estimate the 
 #'  parameters.
+#' @param nb_obs_minimal Integer, minimum number of observation for the smoothing.
 #' @param centered Boolean (default=FALSE), are the data centered?
 #' 
 #' @return A list of with three entries:
@@ -34,6 +35,7 @@
 #' @export
 covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
                           t0_list = seq(0.1, 0.9, by = 0.1),
+                          nb_obs_minimal = 2,
                           centered = FALSE, H_true = NULL){
   # Inner function to compute the covariance on a particular point (s, t)
   gamma_st <- function(data, s0, t0, b, n_obs_min = 2){
@@ -96,17 +98,18 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
            mom2_s, mom2_t, 
            var_st),
       function(s, t, H0_s, H0_t, L0_s, L0_t, mom2_s, mom2_t, var_st){
-        estimate_bandwidth_covariance(data, s, t, 
-                                      H0 = c(H0_s, H0_t), 
-                                      L0 = c(L0_s, L0_t),
-                                      moment2 = c(mom2_s, mom2_t), 
-                                      sigma = sigma_estim, 
-                                      variance = var_st, 
-                                      nb_obs_minimal = 2, 
-                                      type_k = 3)
-        }
-      )
-    )
+        estimate_bandwidth_covariance(
+          data, s, t, 
+          H0 = c(H0_s, H0_t), 
+          L0 = c(L0_s, L0_t),
+          moment2 = c(mom2_s, mom2_t), 
+          sigma = sigma_estim, 
+          variance = var_st, 
+          nb_obs_minimal = nb_obs_minimal, 
+          type_k = 3
+        )
+      }
+    ))
   
   # Create the bandwidth vector
   bb <- matrix(0, nrow = length(t0_list), ncol = length(t0_list))
@@ -118,10 +121,10 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
   cov_df <- cov_df %>% 
     dplyr::mutate(is_upper = t <= s, b = as.vector(bb_large)) %>%
     dplyr::filter(is_upper) %>% 
-    dplyr::mutate(gamma = purrr::pmap_dbl(list(s, t, b), gamma_st, 
-                                        data = data, n_obs_min = 2)) %>%
-    dplyr::mutate(mu = purrr::pmap_dbl(list(s, t, b), mu_st, 
-                                        data = data, n_obs_min = 2)) %>%
+    dplyr::mutate(gamma = purrr::pmap_dbl(
+      list(s, t, b), gamma_st, data = data, n_obs_min = nb_obs_minimal)) %>%
+    dplyr::mutate(mu = purrr::pmap_dbl(
+      list(s, t, b), mu_st, data = data, n_obs_min = nb_obs_minimal)) %>%
     dplyr::mutate(cov = gamma - mu)
 
   #prod_mu <- mu_estim$mu %*% t(mu_estim$mu)
@@ -130,11 +133,11 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
   # Create the final covariance
   res <- matrix(0, nrow = length(U), ncol = length(U))
   res[upper.tri(res, diag = TRUE)] <- cov_df$cov
-  for(t in 1:ncol(res)){
+  for (t in 1:ncol(res)) {
     s <- 1
     current_cov <- res[s, t - s + 1]
-    while(s <= (t - s + 1)){
-      if(abs(U[s] - U[t - s + 1]) > bb_large[s, t - s + 1]) {
+    while (s <= (t - s + 1)) {
+      if (abs(U[s] - U[t - s + 1]) > bb_large[s, t - s + 1]) {
         current_cov <- res[s, t - s + 1]
       } else {
         res[s, t - s + 1] <- current_cov 
@@ -142,11 +145,11 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
       s <- s + 1
     }
   }
-  for(s in 1:nrow(res)){
+  for (s in 1:nrow(res)) {
     t <- ncol(res)
     current_cov <- res[ncol(res) + s - t, t]
-    while(t >= (ncol(res) + s - t)){
-      if(abs(U[ncol(res) + s - t] - U[t]) > bb_large[ncol(res) + s - t, t]) {
+    while (t >= (ncol(res) + s - t)) {
+      if (abs(U[ncol(res) + s - t] - U[t]) > bb_large[ncol(res) + s - t, t]) {
         current_cov <- res[ncol(res) + s - t, t]
       } else {
         res[ncol(res) + s - t, t] <- current_cov 
@@ -187,7 +190,7 @@ covariance_ll <- function(data, U = seq(0, 1, length.out = 101),
 covariance_ss <- function(data, U, nbasis = 5, centered = FALSE, nodiag = TRUE){
   predict_ssanova <- utils::getFromNamespace("predict.ssanova", "gss")
   
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_ <- list2cai(data)
   time <- data_$time
   x <- data_$x
@@ -198,20 +201,20 @@ covariance_ss <- function(data, U, nbasis = 5, centered = FALSE, nodiag = TRUE){
     x <- x - stats::fitted(fit)
   }
   gg <- NULL
-  for(zz in unique(subject)) {
-    if(sum(subject == zz) > 1) {
+  for (zz in unique(subject)) {
+    if (sum(subject == zz) > 1) {
       tt <- time[subject == zz]
       xx <- x[subject == zz]
       g <- expand.grid(t1 = tt, t2 = tt)
       scov <- xx %*% t(xx)
-      if(nodiag) scov <- scov + diag(rep(Inf, length(xx)))
+      if (nodiag) scov <- scov + diag(rep(Inf, length(xx)))
       g$z <- matrix(scov, ncol = 1)
       gg <- rbind(gg, g[g$z < Inf, ])
     }
   }
   
   gg <- unique(gg)
-  nobs <- nrow(gg)
+  #nobs <- nrow(gg)
   tt <- min(time) + (max(time) - min(time)) * (1:nbasis)/(nbasis + 1)
   g <- expand.grid(t1 = tt, t2 = tt)
   g$z <- 0
@@ -244,7 +247,7 @@ covariance_ss <- function(data, U, nbasis = 5, centered = FALSE, nodiag = TRUE){
 #'  data and beyond, The Annals of Statistics
 #' @export
 covariance_lll <- function(data, U, b = 0.1){
-  if(!inherits(data, 'list')) data <- checkData(data)
+  if (!inherits(data, 'list')) data <- checkData(data)
   data_ <- list2cai(data)
   L3 <- fdapace::MakeFPCAInputs(IDs = data_$obs, 
                                 tVec = data_$time, 
